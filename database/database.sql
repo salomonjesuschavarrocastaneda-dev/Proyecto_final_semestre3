@@ -1,0 +1,5 @@
+-- 🟨 GRUPO 3 — BASE DE DATOS
+-- Sistema de Gestión de Inventario
+--
+-- El esquema definitivo será construido por el Grupo 3
+-- y posteriormente conectado desde Django.

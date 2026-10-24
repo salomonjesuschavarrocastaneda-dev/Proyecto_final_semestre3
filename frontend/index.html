@@ -1,158 +1,22 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Inventario</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <div class="app" id="app">
-
-        <!-- ===== Menú lateral ===== -->
-        <aside class="sidebar" id="sidebar" aria-label="Menú principal">
-            <div class="brand">
-                <!-- TODO: reemplazar por el logo en assets/ cuando el equipo lo defina -->
-                <div class="brand__logo" aria-hidden="true">MS</div>
-                <p class="brand__name">Sistema de Gestión de Inventario</p>
-                <p class="brand__company">MAGNUSSIG SAS</p>
-            </div>
-
-            <p class="sidebar__label">Menú principal</p>
-            <nav class="nav">
-                <a class="nav__link is-active" href="#dashboard" data-view="dashboard">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-                    <span>Dashboard</span>
-                </a>
-                <a class="nav__link" href="#productos" data-view="productos">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
-                    <span>Productos</span>
-                    <span class="nav__badge" id="navProductCount">0</span>
-                </a>
-                <a class="nav__link" href="#categorias" data-view="categorias">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><circle cx="17.5" cy="6.5" r="3.5"/><path d="m3 21 3.5-7 3.5 7z"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-                    <span>Categorías</span>
-                </a>
-                <a class="nav__link" href="#movimientos" data-view="movimientos">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16m-4-4 4 4-4 4M20 16H4m4-4-4 4 4 4"/></svg>
-                    <span>Movimientos</span>
-                </a>
-                <a class="nav__link" href="#usuarios" data-view="usuarios">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg>
-                    <span>Usuarios</span>
-                </a>
-                <a class="nav__link" href="#reportes" data-view="reportes">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 5-7"/></svg>
-                    <span>Reportes</span>
-                </a>
-                <a class="nav__link" href="#configuracion" data-view="configuracion">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-                    <span>Configuración</span>
-                </a>
-            </nav>
-        </aside>
-        <div class="scrim" id="scrim"></div>
-
-        <!-- ===== Contenido ===== -->
-        <div class="main">
-            <header class="topbar">
-                <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-                </button>
-
-                <div class="breadcrumb" aria-label="Ruta">
-                    <span>Administración</span>
-                    <span class="breadcrumb__sep">›</span>
-                    <strong id="breadcrumbCurrent">Dashboard</strong>
-                </div>
-
-                <label class="search">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                    <input type="search" id="globalSearch" placeholder="Buscar en el sistema..." aria-label="Buscar en el sistema">
-                </label>
-
-                <button class="icon-btn" aria-label="Notificaciones">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
-                </button>
-
-                <div class="user">
-                    <span class="user__avatar" id="userInitials">SC</span>
-                    <span class="user__info">
-                        <strong id="userName">Salomón Chavarro</strong>
-                        <small id="userRole">Administrador</small>
-                    </span>
-                </div>
-
-                <button class="icon-btn" id="btnLogout" type="button" aria-label="Cerrar sesión" title="Cerrar sesión">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                </button>
-            </header>
-
-            <main class="content" id="content">
-
-                <!-- ===== Vista: Dashboard ===== -->
-                <section class="view is-active" id="view-dashboard" aria-labelledby="dashTitle">
-                    <div class="page-head">
-                        <div>
-                            <h1 id="dashTitle">Dashboard</h1>
-                            <p class="muted">Bienvenido, <span id="welcomeName">Salomón</span>. Este es el resumen de tu inventario.</p>
-                        </div>
-                        <div class="page-head__actions">
-                            <span class="date-chip" id="todayChip"></span>
-                            <button class="btn btn--primary" id="btnRegisterMovement" type="button">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                                Registrar movimiento
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="cards" id="summaryCards"></div>
-
-                    <section class="panel" aria-labelledby="chartTitle">
-                        <header class="panel__head">
-                            <div>
-                                <h2 id="chartTitle">Movimientos de inventario</h2>
-                                <p class="muted">Entradas y salidas de los últimos 7 días</p>
-                            </div>
-                        </header>
-                        <div class="panel__body">
-                            <div class="legend">
-                                <span><i class="dot dot--in"></i>Entradas</span>
-                                <span><i class="dot dot--out"></i>Salidas</span>
-                            </div>
-                            <div class="chart" id="movementsChart" role="img" aria-label="Gráfico de entradas y salidas de los últimos 7 días"></div>
-                        </div>
-                    </section>
-
-                    <section class="panel" aria-labelledby="lowTitle">
-                        <header class="panel__head">
-                            <div>
-                                <h2 id="lowTitle">Productos que requieren atención</h2>
-                                <p class="muted">Stock bajo o agotado</p>
-                            </div>
-                        </header>
-                        <div class="table-wrap">
-                            <table class="table">
-                                <thead>
-                                    <tr><th>Código</th><th>Producto</th><th>Categoría</th><th class="num">Stock</th><th class="num">Mínimo</th><th>Estado</th></tr>
-                                </thead>
-                                <tbody id="attentionRows"></tbody>
-                            </table>
-                        </div>
-                    </section>
-                </section>
-
-                <!-- ===== Vistas pendientes (se construyen en las siguientes entregas) ===== -->
-                <section class="view" id="view-productos"><div class="placeholder"><h1>Productos</h1><p class="muted">Vista en construcción.</p></div></section>
-                <section class="view" id="view-categorias"><div class="placeholder"><h1>Categorías</h1><p class="muted">Vista en construcción.</p></div></section>
-                <section class="view" id="view-movimientos"><div class="placeholder"><h1>Movimientos</h1><p class="muted">Vista en construcción.</p></div></section>
-                <section class="view" id="view-usuarios"><div class="placeholder"><h1>Usuarios</h1><p class="muted">Vista en construcción.</p></div></section>
-                <section class="view" id="view-reportes"><div class="placeholder"><h1>Reportes</h1><p class="muted">Vista en construcción.</p></div></section>
-                <section class="view" id="view-configuracion"><div class="placeholder"><h1>Configuración</h1><p class="muted">Vista en construcción.</p></div></section>
-            </main>
-        </div>
-    </div>
-
-    <script src="js/app.js"></script>
-</body>
-</html>
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#183e91"><title>Inventario | MAGNUSSIG SIG</title><link rel="stylesheet" href="css/styles.css"></head>
+<body><div class="app-shell" id="appShell">
+<aside class="sidebar" id="sidebar"><div class="brand-lockup"><img src="assets/magnussig-logo.jpeg" alt="MAGNUSSIG SIG" class="sidebar-logo" onerror="this.style.display='none'"><div class="brand-fallback"><b>MAGNUSSIG</b><small>Sistema de inventario</small></div></div>
+<div class="workspace-label">ESPACIO DE TRABAJO</div><nav class="nav" id="mainNav">
+<button class="nav-item active" data-view="dashboard"><span>▦</span>Dashboard</button><button class="nav-item" data-view="productos"><span>◈</span>Productos <em id="navProducts">0</em></button><button class="nav-item" data-view="categorias"><span>▤</span>Categorías</button><button class="nav-item" data-view="movimientos"><span>⇄</span>Movimientos</button><button class="nav-item" data-view="ventas"><span>$</span>Ventas</button><button class="nav-item" data-view="usuarios" id="usersNav"><span>♙</span>Usuarios</button><button class="nav-item" data-view="reportes"><span>▥</span>Reportes</button><button class="nav-item" data-view="configuracion"><span>⚙</span>Configuración</button>
+</nav><div class="sidebar-bottom"><button class="help-card" type="button" id="helpCard"><span class="help-icon">i</span><span class="help-copy"><strong>¿Necesitas ayuda?</strong><small>Escribe al administrador y consulta su respuesta.</small></span></button><button class="nav-item logout-link" id="logoutBtn"><span>⇥</span>Cerrar sesión</button></div></aside>
+<div class="sidebar-scrim" id="sidebarScrim"></div><main class="main-area"><header class="topbar"><button class="icon-button menu-button" id="menuButton" aria-label="Abrir menú">☰</button><div class="breadcrumbs"><span>Administración</span><b>/</b><strong id="breadcrumbTitle">Dashboard</strong></div><div class="topbar-right"><label class="global-search"><span>⌕</span><input id="globalSearch" placeholder="Buscar en el sistema..." aria-label="Buscar en el sistema"><kbd>Ctrl K</kbd></label><div class="topbar-user"><div class="avatar" id="userAvatar">A</div><div><strong id="topUserName">Administrador</strong><small id="topUserRole">Administrador</small></div></div></div></header>
+<div class="page-content" id="pageContent">
+<section class="view active" id="view-dashboard"><div class="page-heading"><div><div class="eyebrow">RESUMEN GENERAL</div><h1>Dashboard</h1><p>Bienvenido, <strong id="welcomeName">Administrador</strong>. Este es el estado actual del inventario.</p></div><div class="heading-actions"><span class="date-chip" id="todayDate"></span><button class="btn btn-primary" data-action="new-movement">＋ Registrar movimiento</button></div></div>
+<div class="metric-grid" id="metricGrid"></div><div class="dashboard-grid"><section class="surface-card chart-card"><div class="card-heading"><div><h2>Movimientos de inventario</h2><p>Entradas y salidas recientes</p></div><select id="chartRange" aria-label="Periodo del gráfico"><option value="7">Últimos 7 días</option><option value="30">Últimos 30 días</option></select></div><div class="chart-legend"><span><i class="legend-dot in"></i>Entradas</span><span><i class="legend-dot out"></i>Salidas</span></div><div id="movementChart" class="chart-area"></div></section><section class="surface-card quick-card"><div class="card-heading"><div><h2>Acciones rápidas</h2><p>Accede a tareas habituales</p></div></div><button class="quick-action" data-action="new-product"><span class="quick-icon blue">＋</span><span><b>Agregar producto</b><small>Registrar un artículo nuevo</small></span><span class="arrow">→</span></button><button class="quick-action" data-action="new-movement"><span class="quick-icon green">⇄</span><span><b>Registrar movimiento</b><small>Entrada o salida de stock</small></span><span class="arrow">→</span></button><button class="quick-action" data-action="view-low-stock"><span class="quick-icon amber">!</span><span><b>Revisar stock bajo</b><small>Ver productos que requieren atención</small></span><span class="arrow">→</span></button></section></div>
+<section class="surface-card table-card"><div class="card-heading"><div><h2>Productos que requieren atención</h2><p>Inventario agotado o por debajo del mínimo</p></div><button class="btn btn-secondary btn-small" data-view-link="productos">Ver todos →</button></div><div class="table-scroll"><table class="data-table"><thead><tr><th>CÓDIGO</th><th>PRODUCTO</th><th>CATEGORÍA</th><th>STOCK ACTUAL</th><th>STOCK MÍNIMO</th><th>ESTADO</th><th></th></tr></thead><tbody id="attentionBody"></tbody></table></div></section></section>
+<section class="view" id="view-productos"><div class="page-heading"><div><div class="eyebrow">CATÁLOGO</div><h1>Productos</h1><p>Administra los artículos y sus niveles de existencias.</p></div><button class="btn btn-primary" data-action="new-product">＋ Nuevo producto</button></div><section class="surface-card"><div class="list-toolbar"><label class="table-search">⌕ <input id="productSearch" placeholder="Buscar por nombre, código o categoría..."></label><select id="productStatusFilter"><option value="">Todos los estados</option><option value="disponible">Disponible</option><option value="bajo">Stock bajo</option><option value="agotado">Agotado</option></select><button class="btn btn-secondary btn-small" id="exportProducts">↓ Exportar CSV</button></div><div class="table-scroll"><table class="data-table"><thead><tr><th>CÓDIGO</th><th>PRODUCTO</th><th>CATEGORÍA</th><th>PRECIO UNITARIO</th><th>STOCK</th><th>STOCK MÍNIMO</th><th>ESTADO</th><th>ACCIONES</th></tr></thead><tbody id="productsBody"></tbody></table></div><div class="table-footer" id="productsFooter"></div></section></section>
+<section class="view" id="view-categorias"><div class="page-heading"><div><div class="eyebrow">ORGANIZACIÓN</div><h1>Categorías</h1><p>Busca por categoría o por producto; cada resultado muestra su categoría asociada.</p></div><button class="btn btn-primary" data-action="new-category">＋ Nueva categoría</button></div><section class="surface-card"><div class="list-toolbar"><label class="table-search">⌕ <input id="categorySearch" placeholder="Buscar por nombre de categoría, producto o código..."></label></div><div id="categoryGrid" class="category-grid"></div></section></section>
+<section class="view" id="view-movimientos"><div class="page-heading"><div><div class="eyebrow">TRAZABILIDAD</div><h1>Movimientos</h1><p>Consulta y registra entradas, salidas y ajustes de inventario.</p></div><button class="btn btn-primary" data-action="new-movement">＋ Registrar movimiento</button></div><section class="surface-card"><div class="list-toolbar"><label class="table-search">⌕ <input id="movementSearch" placeholder="Buscar producto o referencia..."></label><select id="movementTypeFilter"><option value="">Todos los tipos</option><option value="entrada">Entrada</option><option value="salida">Salida</option><option value="ajuste">Ajuste</option></select></div><div class="table-scroll"><table class="data-table"><thead><tr><th>FECHA</th><th>REFERENCIA</th><th>PRODUCTO</th><th>TIPO</th><th>CANTIDAD</th><th>USUARIO</th><th>OBSERVACIÓN</th></tr></thead><tbody id="movementsBody"></tbody></table></div></section></section>
+<section class="view" id="view-ventas"><div class="page-heading"><div><div class="eyebrow">VENTAS</div><h1>Registro de ventas</h1><p>Registra productos, cantidades y forma de pago; el inventario se descuenta automáticamente.</p></div><button class="btn btn-primary" data-action="new-sale">＋ Registrar venta</button></div><section class="surface-card"><div class="list-toolbar"><label class="table-search">⌕ <input id="saleSearch" placeholder="Buscar por referencia, cliente o producto..."></label></div><div class="table-scroll"><table class="data-table"><thead><tr><th>FECHA</th><th>REFERENCIA</th><th>CLIENTE</th><th>PRODUCTOS</th><th>FORMA DE PAGO</th><th>VENDEDOR</th><th>TOTAL</th></tr></thead><tbody id="salesBody"></tbody></table></div></section></section>
+<section class="view" id="view-usuarios"><div class="page-heading"><div><div class="eyebrow">ACCESOS</div><h1>Usuarios</h1><p>El administrador crea cuentas y asigna roles con acceso limitado o completo.</p></div><button class="btn btn-primary" data-action="new-user">＋ Crear usuario</button></div><section class="surface-card"><div class="list-toolbar"><label class="table-search">⌕ <input id="userSearch" placeholder="Buscar por nombre o correo..."></label></div><div class="table-scroll"><table class="data-table"><thead><tr><th>USUARIO</th><th>CORREO</th><th>ROL</th><th>ESTADO</th><th>REGISTRO</th><th>ACCIONES</th></tr></thead><tbody id="usersBody"></tbody></table></div></section></section>
+<section class="view" id="view-reportes"><div class="page-heading"><div><div class="eyebrow">ANÁLISIS</div><h1>Reportes</h1><p>Indicadores y exportaciones para apoyar las decisiones operativas.</p></div><button class="btn btn-primary" id="exportReport">↓ Exportar inventario</button></div><div class="report-grid" id="reportGrid"></div><section class="surface-card"><div class="card-heading"><div><h2>Resumen del inventario</h2><p>Detalle de existencias, valorización y estado.</p></div></div><div class="table-scroll"><table class="data-table"><thead><tr><th>INDICADOR</th><th>VALOR</th><th>DESCRIPCIÓN</th></tr></thead><tbody id="reportBody"></tbody></table></div></section></section>
+<section class="view" id="view-configuracion"><div class="page-heading"><div><div class="eyebrow">PREFERENCIAS</div><h1>Configuración</h1><p>Preferencias de inventario y sesión.</p></div></div><section class="surface-card settings-card"><div class="settings-row"><div><b>Empresa</b><p>MAGNUSSIG SAS · Asesoría e Ingeniería en sistemas integrados de gestión</p></div><span class="setting-value">Neiva, Huila</span></div><div class="settings-row"><div><b>Umbral de stock</b><p>Los productos con existencias iguales o inferiores al mínimo se marcan como stock bajo.</p></div><span class="setting-value">Automático</span></div><div class="settings-row"><div><b>Sesión actual</b><p id="settingsSessionUser">Usuario conectado</p></div><button class="btn btn-secondary btn-small" id="settingsLogout">Cerrar sesión</button></div><div class="settings-row"><div><b>Conexión</b><p>Inventario sincronizado con la base de datos Django.</p></div><span class="status-pill" id="connectionStatus">Comprobando</span></div></section></section>
+</div></main></div>
+<div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><header class="modal-header"><div><span class="eyebrow" id="modalEyebrow">GESTIÓN</span><h2 id="modalTitle">Formulario</h2></div><button class="icon-button" type="button" id="modalClose" aria-label="Cerrar">×</button></header><form id="modalForm"><div class="modal-body" id="modalBody"></div><footer class="modal-footer" id="modalFooter"><button type="button" class="btn btn-secondary" id="modalCancel">Cancelar</button><button type="submit" class="btn btn-primary" id="modalSubmit">Guardar</button></footer></form></section></div>
+<div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div><script src="js/app.js"></script></body></html>

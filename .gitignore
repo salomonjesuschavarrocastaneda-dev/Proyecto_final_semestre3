@@ -1,26 +1,10 @@
-# Python
 __pycache__/
 *.py[cod]
-*.pyo
-
-# Entornos virtuales
-venv/
 .venv/
-env/
-
-# Variables y secretos
+venv/
 .env
-
-# VS Code
-.vscode/
-
-# Sistema operativo
+backend/db.sqlite3
+*.log
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
-
-# Temporales
-*.tmp
-*.temp
+.vscode/

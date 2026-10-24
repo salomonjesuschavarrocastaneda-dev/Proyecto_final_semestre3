@@ -1,3 +1,5 @@
-Django
-mysqlclient
-python-dotenv
+Django>=5.2,<5.3
+djangorestframework>=3.16,<3.17
+mysqlclient>=2.2,<3
+python-dotenv>=1.1,<2
+django-cors-headers>=4.7,<5

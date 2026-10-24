@@ -1,42 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión · Sistema de Gestión de Inventario</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/login.css">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183e91"><title>Acceso | MAGNUSSIG SIG</title>
+  <link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/login.css">
 </head>
 <body class="login-body">
-    <main class="login">
-        <section class="login__card" aria-labelledby="loginTitle">
-            <!-- TODO: reemplazar por el logo en assets/ cuando el equipo lo defina -->
-            <div class="brand__logo login__logo" aria-hidden="true">MS</div>
-            <h1 id="loginTitle">Iniciar sesión</h1>
-            <p class="muted">Sistema de Gestión de Inventario · MAGNUSSIG SAS</p>
-
-            <div class="alert" id="loginError" role="alert" hidden></div>
-
-            <form id="loginForm" novalidate>
-                <div class="field">
-                    <label for="loginUser">Usuario o correo</label>
-                    <input id="loginUser" name="usuario" type="text" autocomplete="username" required aria-describedby="loginUserError">
-                    <p class="field__error" id="loginUserError" hidden></p>
-                </div>
-
-                <div class="field">
-                    <label for="loginPassword">Contraseña</label>
-                    <div class="field__password">
-                        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required aria-describedby="loginPasswordError">
-                        <button type="button" class="field__toggle" id="togglePassword" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button>
-                    </div>
-                    <p class="field__error" id="loginPasswordError" hidden></p>
-                </div>
-
-                <button class="btn btn--primary login__submit" id="loginSubmit" type="submit">Ingresar</button>
-            </form>
-        </section>
-    </main>
-    <script src="js/login.js"></script>
-</body>
-</html>
+  <main class="login-layout">
+    <section class="login-brand-panel">
+      <img src="assets/magnussig-logo.jpeg" alt="MAGNUSSIG SIG — Asesoría e Ingeniería en sistemas integrados de gestión" class="login-brand-logo" onerror="this.style.display='none'">
+      <div class="brand-monogram">MS</div>
+      <p class="eyebrow">MAGNUSSIG SAS · NEIVA, HUILA</p>
+      <h1>Control, trazabilidad<br>y decisiones inteligentes.</h1>
+      <p class="brand-copy">Sistema de gestión de inventario para una operación organizada, segura y eficiente.</p>
+      <div class="brand-pills"><span>Inventario</span><span>Movimientos</span><span>Reportes</span></div>
+    </section>
+    <section class="login-panel">
+      <div class="login-card">
+        <div class="login-heading"><span class="eyebrow">PORTAL EMPRESARIAL</span><h2 id="authTitle">Bienvenido de nuevo</h2><p id="authSubtitle">Ingresa tus credenciales para continuar.</p></div>
+        <div class="alert" id="authAlert" role="alert" hidden></div>
+        <form id="loginForm">
+          <div class="field"><label for="loginEmail">Correo electrónico</label><input id="loginEmail" type="email" autocomplete="username" placeholder="nombre@empresa.com" required></div>
+          <div class="field"><label for="loginPassword">Contraseña</label><div class="password-wrap"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" required minlength="8"><button type="button" id="togglePassword" class="password-toggle">Mostrar</button></div></div>
+          <div class="login-options"><label class="remember"><input type="checkbox" id="rememberMe"> Mantener sesión</label><button type="button" class="text-button" id="showForgot">¿Olvidaste tu contraseña?</button></div>
+          <button class="btn btn-primary btn-full" type="submit" id="loginSubmit">Iniciar sesión <span aria-hidden="true">→</span></button>
+        </form>
+        <form id="forgotForm" hidden>
+          <p class="form-help">Escribe el correo asociado a la cuenta. Si el servicio de correo está configurado, el sistema enviará instrucciones de recuperación.</p>
+          <div class="field"><label for="forgotEmail">Correo electrónico</label><input id="forgotEmail" type="email" autocomplete="email" required placeholder="nombre@empresa.com"></div>
+          <button class="btn btn-primary btn-full" type="submit">Enviar instrucciones</button>
+        </form>
+        <div class="auth-footer"><span id="authFooterText">Las cuentas son creadas por el administrador del sistema.</span><button type="button" class="text-button" id="showLogin" hidden>Volver a iniciar sesión</button></div>
+        <p class="security-note"><span aria-hidden="true">●</span> Acceso protegido · Uso exclusivo del personal autorizado</p>
+      </div>
+      <footer>© <span id="year"></span> MAGNUSSIG SAS · Sistema interno</footer>
+    </section>
+  </main>
+  <script src="js/auth.js"></script>
+</body></html>

@@ -1,1 +1,16 @@
 /* La vista de autenticación reutiliza la identidad y variables de styles.css. */
+.login-brand-logo {
+  display: block;
+  width: min(100%, 300px);
+  max-width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0 auto 30px;
+  padding: 0;
+  object-fit: contain;
+  object-position: center;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(8, 24, 60, 0.2);
+}

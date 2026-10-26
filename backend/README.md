@@ -1,6 +1,6 @@
 # Backend MAGNUSSIG SIG
 
-Django REST API para el sistema de inventario. Para facilitar una primera ejecución se usa SQLite por defecto; puede cambiarse a MySQL mediante variables de entorno.
+Django REST API para el sistema de inventario. La configuración de ejemplo usa MySQL local; los valores privados se guardan en `backend/.env`, que no se sube a Git.
 
 ## Instalación (Windows / PowerShell)
 
@@ -9,13 +9,17 @@ cd backend
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
 
-API: `http://127.0.0.1:8000/api/`. Salud: `http://127.0.0.1:8000/health/`. Admin: `/admin/`.
+Antes de ejecutar las migraciones, confirma en `.env` los datos de tu MySQL (`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST` y `DB_PORT`). Conserva tu `.env` local al actualizar el proyecto; no lo reemplaces por `.env.example`.
+
+API: `http://127.0.0.1:3000/api/`. Salud: `http://127.0.0.1:3000/health/`. Admin: `/admin/`. El comando `runserver` usa el puerto definido por `PORT` en `.env` (si no existe, usa el puerto 8000 de Django).
+
+`requirements.txt` instala PyMySQL, un conector compatible con Windows que evita tener que compilar `mysqlclient`. Si ya habías creado el entorno virtual antes de cambiar el conector, actívalo y vuelve a ejecutar `pip install -r requirements.txt`.
 
 ## Endpoints principales
 - `POST /api/auth/register/` — creación de cuenta solo para administradores autenticados.
@@ -34,4 +38,4 @@ Las rutas protegidas requieren autenticación por token. Los empleados pueden re
 
 La configuración SMTP se define con `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL` y `DEFAULT_FROM_EMAIL` en `backend/.env`. Las rutas de recuperación HTML de Django están disponibles bajo `/accounts/`.
 
-Para MySQL: instala el conector requerido, crea la base `magnussig_inventario`, configura `DB_ENGINE=mysql` y demás valores en `.env`, y ejecuta `python manage.py migrate`. No subas `.env` ni contraseñas a GitHub.
+Para MySQL: instala el conector requerido, crea la base `magnussig_inventario` si aún no existe, configura las variables `DB_*` en `.env` y ejecuta `python manage.py migrate`. No subas `.env` ni contraseñas a GitHub.

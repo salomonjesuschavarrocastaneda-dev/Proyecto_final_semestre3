@@ -1,5 +1,5 @@
 /* MAGNUSSIG SIG — inventario conectado a la API Django. */
-const API_BASE=localStorage.getItem('inventario.apiBase')||'http://127.0.0.1:8000/api';
+const API_BASE=localStorage.getItem('inventario.apiBase')||'http://127.0.0.1:3000/api';
 const SESSION_KEY='inventario.session';
 const $=id=>document.getElementById(id);
 const session=()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY));}catch{return null;}};
@@ -120,7 +120,57 @@ function renderMovements(){if(resourceErrors.movements){$('movementsBody').inner
 function renderUsers(){const createUserButton=document.querySelector('[data-action="new-user"]');if(createUserButton)createUserButton.hidden=!isAdmin();if(!isAdmin()){ $('usersBody').innerHTML='<tr><td colspan="6" class="error-row">Solo el administrador puede consultar y gestionar las cuentas.</td></tr>';return;}if(resourceErrors.users){$('usersBody').innerHTML=`<tr><td colspan="6" class="error-row">${esc(resourceErrors.users)}</td></tr>`;return;}const q=($('userSearch').value||'').toLowerCase();const users=state.users.filter(u=>`${u.nombre} ${u.email}`.toLowerCase().includes(q));$('usersBody').innerHTML=users.length?users.map(u=>`<tr><td><b>${esc(u.nombre)}</b></td><td>${esc(u.email)}</td><td>${esc(u.rol||'Empleado')}</td><td><span class="status-pill status-active">${esc(u.estado||'Activo')}</span></td><td>${fmtDate(u.creado)}</td><td>${Number(u.id)===Number(session()?.user?.id)?'Cuenta actual':`<button data-delete-user="${u.id}">Eliminar</button>`}</td></tr>`).join(''):'<tr><td colspan="6" class="empty-row">No hay usuarios registrados.</td></tr>';}
 function renderSales(){if(resourceErrors.sales){$('salesBody').innerHTML=`<tr><td colspan="7" class="error-row">${esc(resourceErrors.sales)}</td></tr>`;return;}const q=($('saleSearch').value||'').trim().toLowerCase();const rows=state.sales.filter(sale=>`${sale.referencia} ${sale.cliente||''} ${sale.vendedor_nombre||''} ${sale.detalles.map(line=>line.producto_nombre).join(' ')}`.toLowerCase().includes(q));$('salesBody').innerHTML=rows.length?rows.map(sale=>`<tr><td>${fmtDate(sale.fecha?.slice(0,10))}</td><td><span class="code-pill">${esc(sale.referencia)}</span></td><td>${esc(sale.cliente||'Venta general')}</td><td>${sale.detalles.map(line=>`${esc(line.producto_nombre)} × ${line.cantidad}`).join('<br>')}</td><td>${esc(sale.forma_pago)}</td><td>${esc(sale.vendedor_nombre||'Usuario')}</td><td><b>${money(sale.total)}</b></td></tr>`).join(''):'<tr><td colspan="7" class="empty-row">Aún no hay ventas que coincidan.</td></tr>';}
 function renderSaleCart(){const container=$('saleCart');if(!container)return;const total=saleCart.reduce((sum,line)=>sum+Number(line.producto.precio)*line.cantidad,0);container.innerHTML=saleCart.length?saleCart.map(line=>`<div class="sale-cart-line"><span><b>${esc(line.producto.nombre)}</b><small>${line.cantidad} × ${money(line.producto.precio)}</small></span><strong>${money(line.cantidad*Number(line.producto.precio))}</strong><button class="btn btn-secondary btn-small" type="button" data-remove-sale-line="${line.producto.id}">Quitar</button></div>`).join(''):'<p class="empty-row">Agrega productos a la venta.</p>';$('saleTotal').textContent=money(total);}
-function newSale(){const available=state.products.filter(product=>Number(product.stock)>0&&product.estado==='activo'&&(!product.fecha_caducidad||product.fecha_caducidad>=today()));if(!available.length){toast('No hay productos activos, vigentes y con stock para vender.','error');return;}saleCart=[];const methods=[['efectivo','Efectivo'],['transferencia','Transferencia'],['tarjeta','Tarjeta'],['credito','Crédito'],['otro','Otro']].map(([value,label])=>({value,label}));openModal('Registrar venta',`<div class="form-grid">${field('cliente','Cliente (opcional)','text',{required:false})}${field('forma_pago','Forma de pago','select',{options:methods})}<div class="form-field"><label for="saleProductSelect">Producto</label><select id="saleProductSelect">${available.map(product=>`<option value="${product.id}">${esc(product.codigo)} · ${esc(product.nombre)} · ${esc(product.categoria_nombre||catName(product.categoria_id))} · ${product.stock} en stock · ${money(product.precio)}</option>`).join('')}</select></div><div class="form-field"><label for="saleQuantity">Cantidad</label><input id="saleQuantity" type="number" min="1" step="1" value="1"></div><button class="btn btn-secondary" type="button" id="addSaleProduct">＋ Agregar producto</button></div><div class="sale-cart"><h3>Productos de la venta</h3><div id="saleCart"></div><div class="sale-total">Total <strong id="saleTotal">$0</strong></div></div>`,'Guardar venta',async data=>{if(!saleCart.length)throw Error('Agrega al menos un producto a la venta.');await apiRequest('/ventas/',{method:'POST',body:JSON.stringify({cliente:data.cliente.trim(),forma_pago:data.forma_pago,detalles:saleCart.map(line=>({producto:line.producto.id,cantidad:line.cantidad}))})});saleCart=[];await refreshResources();renderAll();toast('Venta registrada. Stock y movimientos actualizados.');});$('modalFooter').hidden=false;renderSaleCart();$('addSaleProduct').addEventListener('click',()=>{const product=available.find(item=>item.id===Number($('saleProductSelect').value));const quantity=Number($('saleQuantity').value);if(!product)return;if(!Number.isInteger(quantity)||quantity<1){toast('La cantidad debe ser un entero positivo.','error');return;}const existing=saleCart.find(line=>line.producto.id===product.id);const alreadyAdded=existing?.cantidad||0;if(quantity+alreadyAdded>Number(product.stock)){toast(`Stock insuficiente. Disponible: ${product.stock-alreadyAdded}.`,'error');return;}if(existing)existing.cantidad+=quantity;else saleCart.push({producto,cantidad:quantity});renderSaleCart();});}
+function saleProductUnavailableReason(product){
+    if(product.estado!=='activo')return'Producto no disponible · inactivo';
+    if(product.fecha_caducidad&&product.fecha_caducidad<today())return'Producto no disponible · vencido';
+    if(Number(product.stock)<=0)return'Producto no disponible · sin stock';
+    if(Number(product.precio)<=0)return'Producto no disponible · sin precio';
+    return'';
+}
+function newSale(){
+    const activeProducts=state.products.filter(product=>product.estado==='activo'&&(!product.fecha_caducidad||product.fecha_caducidad>=today()));
+    const available=activeProducts.filter(product=>Number(product.stock)>0&&Number(product.precio)>0);
+    const availabilityMessage=!activeProducts.length
+        ?'No hay productos activos y vigentes para vender.'
+        :!activeProducts.some(product=>Number(product.stock)>0)
+            ?'No hay existencias disponibles. Registra una entrada de inventario antes de vender.'
+            :!activeProducts.some(product=>Number(product.precio)>0)
+                ?'Asigna un precio mayor que cero a los productos antes de venderlos.'
+                :'Solo se pueden vender productos con stock disponible y precio registrado.';
+    saleCart=[];
+    const methods=[['efectivo','Efectivo'],['transferencia','Transferencia'],['tarjeta','Tarjeta'],['credito','Crédito'],['otro','Otro']].map(([value,label])=>({value,label}));
+    const productOptions=state.products.length
+        ?state.products.map(product=>{
+            const unavailableReason=saleProductUnavailableReason(product);
+            const availability=unavailableReason||`${product.stock} en stock · ${money(product.precio)}`;
+            return `<option value="${product.id}">${esc(product.codigo)} · ${esc(product.nombre)} · ${esc(product.categoria_nombre||catName(product.categoria_id))} · ${esc(availability)}</option>`;
+        }).join('')
+        :'<option value="">No hay productos registrados</option>';
+    openModal('Registrar venta',`<div class="form-grid">${field('cliente','Cliente (opcional)','text',{required:false})}${field('forma_pago','Forma de pago','select',{options:methods})}<div class="form-field"><label for="saleProductSelect">Producto</label><select id="saleProductSelect" ${state.products.length?'':'disabled'}>${productOptions}</select></div><div class="form-field"><label for="saleQuantity">Cantidad</label><input id="saleQuantity" type="number" min="1" step="1" value="1"></div><button class="btn btn-secondary" type="button" id="addSaleProduct" ${state.products.length?'':'disabled'}>＋ Agregar producto</button>${available.length?'':`<p class="form-help full">${esc(availabilityMessage)}</p>`}</div><div class="sale-cart"><h3>Productos de la venta</h3><div id="saleCart"></div><div class="sale-total">Total <strong id="saleTotal">$0</strong></div></div>`,'Guardar venta',async data=>{
+        if(!saleCart.length)throw Error('Agrega al menos un producto con stock y precio a la venta.');
+        await apiRequest('/ventas/',{method:'POST',body:JSON.stringify({cliente:data.cliente.trim(),forma_pago:data.forma_pago,detalles:saleCart.map(line=>({producto:line.producto.id,cantidad:line.cantidad}))})});
+        saleCart=[];
+        await refreshResources();
+        renderAll();
+        toast('Venta registrada. Stock y movimientos actualizados.');
+    });
+    $('modalFooter').hidden=false;
+    renderSaleCart();
+    $('addSaleProduct').addEventListener('click',()=>{
+        const product=state.products.find(item=>item.id===Number($('saleProductSelect').value));
+        const quantity=Number($('saleQuantity').value);
+        if(!product)return;
+        const unavailableReason=saleProductUnavailableReason(product);
+        if(unavailableReason){toast(`${product.nombre}: ${unavailableReason.toLowerCase()}.`,'error');return;}
+        if(!Number.isInteger(quantity)||quantity<1){toast('La cantidad debe ser un entero positivo.','error');return;}
+        const existing=saleCart.find(line=>line.producto.id===product.id);
+        const alreadyAdded=existing?.cantidad||0;
+        if(quantity+alreadyAdded>Number(product.stock)){toast(`Stock insuficiente. Disponible: ${product.stock-alreadyAdded}.`,'error');return;}
+        if(existing)existing.cantidad+=quantity;
+        else saleCart.push({producto:product,cantidad:quantity});
+        renderSaleCart();
+    });
+}
 async function openHelpCenter(){try{helpTickets=await apiList('/ayuda/');selectedHelpId=helpTickets[0]?.id||null;openModal('Centro de ayuda','<div class="help-center"><aside class="help-inbox" id="helpInbox"></aside><section class="help-conversation" id="helpConversation"></section></div>','',()=>{});$('modalFooter').hidden=true;$('modalForm').onsubmit=event=>event.preventDefault();renderHelpCenter();clearInterval(helpRefreshTimer);helpRefreshTimer=setInterval(async()=>{try{helpTickets=await apiList('/ayuda/');if(!helpTickets.some(ticket=>Number(ticket.id)===Number(selectedHelpId)))selectedHelpId=helpTickets[0]?.id||null;const typing=[$('helpReply'),$('helpSubject'),$('helpInitialMessage')].includes(document.activeElement);if(!typing)renderHelpCenter();}catch(error){console.error('No se pudieron actualizar las conversaciones de ayuda:',error);}},15000);}catch(error){toast(error.message,'error');}}
 function renderHelpCenter(){
     const inbox=$('helpInbox'),conversation=$('helpConversation');

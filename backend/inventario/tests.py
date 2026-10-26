@@ -207,6 +207,38 @@ class InventoryApiTests(TestCase):
         self.assertEqual(initial_movement.stock_nuevo, 4)
         self.assertEqual(initial_movement.usuario, self.admin)
 
+    def test_admin_can_edit_product_without_changing_stock(self):
+        self.authenticate(self.admin)
+        response = self.client.patch(
+            f"/api/productos/{self.product.id}/",
+            {"nombre": "Producto actualizado", "precio": "1750.00"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200, response.data)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.nombre, "Producto actualizado")
+        self.assertEqual(self.product.precio, 1750)
+        self.assertEqual(self.product.stock, 10)
+        self.assertFalse(Movimiento.objects.filter(producto=self.product).exists())
+
+    def test_admin_can_edit_product_stock_and_adjustment_is_recorded(self):
+        self.authenticate(self.admin)
+        response = self.client.patch(
+            f"/api/productos/{self.product.id}/",
+            {"stock": 6, "ubicacion": "Bodega principal"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200, response.data)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock, 6)
+        self.assertEqual(self.product.ubicacion, "Bodega principal")
+        movement = Movimiento.objects.get(producto=self.product)
+        self.assertEqual(movement.tipo, "ajuste")
+        self.assertEqual(movement.cantidad, 4)
+        self.assertEqual(movement.stock_anterior, 10)
+        self.assertEqual(movement.stock_nuevo, 6)
+        self.assertEqual(movement.usuario, self.admin)
+
     def test_admin_can_reactivate_category_without_losing_its_products(self):
         self.authenticate(self.admin)
         category = Categoria.objects.create(nombre="Reactivable")

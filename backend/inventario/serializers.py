@@ -28,7 +28,7 @@ class CategoriaSerializer(serializers.ModelSerializer):
 
 class ProductoSerializer(serializers.ModelSerializer):
     categoria = serializers.PrimaryKeyRelatedField(
-        queryset=Categoria.objects.filter(activa=True)
+        queryset=Categoria.objects.all()
     )
     categoria_nombre = serializers.CharField(source="categoria.nombre", read_only=True)
     categoria_id = serializers.IntegerField(source="categoria.id", read_only=True)
@@ -64,16 +64,15 @@ class ProductoSerializer(serializers.ModelSerializer):
     def validate_codigo(self, value):
         return value.strip().upper()
 
-    def validate(self, attrs):
-        if attrs.get("precio", 0) < 0:
+    def validate_categoria(self, value):
+        if (
+            not value.activa
+            and (not self.instance or self.instance.categoria_id != value.pk)
+        ):
             raise serializers.ValidationError(
-                {"precio": "El precio no puede ser negativo."}
+                "Selecciona una categoría activa."
             )
-        if self.instance and "stock" in attrs and attrs["stock"] != self.instance.stock:
-            raise serializers.ValidationError(
-                {"stock": "El stock solo se modifica mediante un movimiento."}
-            )
-        return attrs
+        return value
 
     @transaction.atomic
     def create(self, validated_data):
@@ -91,6 +90,39 @@ class ProductoSerializer(serializers.ModelSerializer):
                 stock_nuevo=initial_stock,
                 fecha=timezone.localdate(),
                 observacion="Stock inicial al crear el producto.",
+                usuario=(
+                    request.user
+                    if request and request.user.is_authenticated
+                    else None
+                ),
+            )
+        return product
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        product = Producto.objects.select_for_update().get(pk=instance.pk)
+        previous_stock = product.stock
+        new_stock = validated_data.pop("stock", previous_stock)
+
+        for attribute, value in validated_data.items():
+            setattr(product, attribute, value)
+        product.stock = new_stock
+        product.save()
+
+        if new_stock != previous_stock:
+            request = self.context.get("request")
+            Movimiento.objects.create(
+                referencia=f"MOV-{uuid.uuid4().hex[:32].upper()}",
+                producto=product,
+                tipo="ajuste",
+                cantidad=abs(new_stock - previous_stock),
+                stock_anterior=previous_stock,
+                stock_nuevo=new_stock,
+                fecha=timezone.localdate(),
+                observacion=(
+                    f"Ajuste de stock al editar el producto: "
+                    f"{previous_stock} a {new_stock}."
+                ),
                 usuario=(
                     request.user
                     if request and request.user.is_authenticated

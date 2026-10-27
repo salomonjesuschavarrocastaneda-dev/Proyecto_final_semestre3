@@ -65,7 +65,7 @@ La auditoría local del 27 de octubre de 2026 encontró 29 pruebas y terminó co
 - Una prueba útil de persistencia es crear un producto de prueba, cerrar sesión y volver a entrar; para comprobar reinicio de servicio, detener Django con `Ctrl+C`, iniciarlo de nuevo contra la misma base y consultar el producto de nuevo.
 
 ## Endpoints principales
-- `POST /api/auth/register/` — creación de cuenta solo para administradores autenticados.
+- `POST /api/auth/register/` — registro público con nombre, correo, contraseña, confirmación y rol (`Empleado` o `Administrador`). Las cuentas se activan inmediatamente; el rol de Administrador concede acceso completo al sistema.
 - `POST /api/auth/login/` — recibe `{ "email": "...", "password": "..." }`, devuelve token y usuario.
 - `POST /api/auth/logout/` — revoca el token de la sesión autenticada.
 - `POST /api/auth/password-reset/` — solicita recuperación; para envío real configura EMAIL en Django.

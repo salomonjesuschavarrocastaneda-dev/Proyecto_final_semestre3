@@ -25,12 +25,20 @@
           <div class="login-options"><label class="remember"><input type="checkbox" id="rememberMe"> Mantener sesión</label><button type="button" class="text-button" id="showForgot">¿Olvidaste tu contraseña?</button></div>
           <button class="btn btn-primary btn-full" type="submit" id="loginSubmit">Iniciar sesión <span aria-hidden="true">→</span></button>
         </form>
+        <form id="registerForm" hidden>
+          <div class="field"><label for="registerName">Nombre completo</label><input id="registerName" type="text" autocomplete="name" maxlength="150" placeholder="Tu nombre" required></div>
+          <div class="field"><label for="registerEmail">Correo electrónico</label><input id="registerEmail" type="email" autocomplete="email" placeholder="nombre@empresa.com" required></div>
+          <div class="field"><label for="registerPassword">Contraseña</label><input id="registerPassword" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required minlength="8"></div>
+          <div class="field"><label for="registerPasswordConfirm">Confirmar contraseña</label><input id="registerPasswordConfirm" type="password" autocomplete="new-password" placeholder="Repite tu contraseña" required minlength="8"></div>
+          <div class="field"><label for="registerRole">Crear cuenta como</label><select id="registerRole" required><option value="Empleado">Empleado</option><option value="Administrador">Administrador</option></select><p class="form-help">Las cuentas de administrador tienen acceso completo al sistema.</p></div>
+          <button class="btn btn-primary btn-full" type="submit" id="registerSubmit">Crear cuenta</button>
+        </form>
         <form id="forgotForm" hidden>
           <p class="form-help">Escribe el correo asociado a la cuenta. Si el servicio de correo está configurado, el sistema enviará instrucciones de recuperación.</p>
           <div class="field"><label for="forgotEmail">Correo electrónico</label><input id="forgotEmail" type="email" autocomplete="email" required placeholder="nombre@empresa.com"></div>
           <button class="btn btn-primary btn-full" type="submit">Enviar instrucciones</button>
         </form>
-        <div class="auth-footer"><span id="authFooterText">Las cuentas son creadas por el administrador del sistema.</span><button type="button" class="text-button" id="showLogin" hidden>Volver a iniciar sesión</button></div>
+        <div class="auth-footer"><span id="authFooterText">¿Aún no tienes cuenta?</span><button type="button" class="text-button" id="showCreate">Crear cuenta</button><button type="button" class="text-button" id="showLogin" hidden>Iniciar sesión</button></div>
         <p class="security-note"><span aria-hidden="true">●</span> Acceso protegido · Uso exclusivo del personal autorizado</p>
       </div>
       <footer>© <span id="year"></span> MAGNUSSIG SAS · Sistema interno</footer>

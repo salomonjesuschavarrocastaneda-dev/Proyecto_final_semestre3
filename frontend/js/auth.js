@@ -1,7 +1,7 @@
 const API_BASE = localStorage.getItem('inventario.apiBase') || 'http://127.0.0.1:3000/api';
 const SESSION_KEY = 'inventario.session';
 const $ = (id) => document.getElementById(id);
-const forms = { login: $('loginForm'), forgot: $('forgotForm') };
+const forms = { login: $('loginForm'), register: $('registerForm'), forgot: $('forgotForm') };
 
 function alertMessage(message, type = 'error') {
   const element = $('authAlert');
@@ -44,14 +44,20 @@ function setMode(mode) {
   Object.values(forms).forEach((form) => { form.hidden = true; });
   forms[mode].hidden = false;
   $('showForgot').hidden = mode !== 'login';
+  $('showCreate').hidden = mode !== 'login';
   $('showLogin').hidden = mode === 'login';
   $('authFooterText').hidden = mode === 'forgot';
+  $('authFooterText').textContent = mode === 'register'
+    ? '¿Ya tienes cuenta?'
+    : '¿Aún no tienes cuenta?';
   $('authTitle').textContent = mode === 'login'
     ? 'Bienvenido de nuevo'
-    : 'Recuperar contraseña';
+    : mode === 'register' ? 'Crear cuenta' : 'Recuperar contraseña';
   $('authSubtitle').textContent = mode === 'login'
     ? 'Ingresa tus credenciales para continuar.'
-    : 'Te enviaremos instrucciones si el correo está registrado.';
+    : mode === 'register'
+      ? 'Completa tus datos para acceder al sistema.'
+      : 'Te enviaremos instrucciones si el correo está registrado.';
 }
 
 function saveSession(data, email) {
@@ -72,6 +78,7 @@ function saveSession(data, email) {
 }
 
 $('showForgot').addEventListener('click', () => setMode('forgot'));
+$('showCreate').addEventListener('click', () => setMode('register'));
 $('showLogin').addEventListener('click', () => setMode('login'));
 $('togglePassword').addEventListener('click', () => {
   const password = $('loginPassword');
@@ -99,6 +106,43 @@ forms.login.addEventListener('submit', async (event) => {
   } finally {
     button.disabled = false;
     button.innerHTML = 'Iniciar sesión <span aria-hidden="true">→</span>';
+  }
+});
+
+forms.register.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  clearAlert();
+  const email = $('registerEmail').value.trim().toLowerCase();
+  const password = $('registerPassword').value;
+  const button = $('registerSubmit');
+  let accountCreated = false;
+  button.disabled = true;
+  button.textContent = 'Creando cuenta…';
+  try {
+    await request('/auth/register/', {
+      method: 'POST',
+      body: JSON.stringify({
+        nombre: $('registerName').value.trim(),
+        email,
+        password,
+        password_confirm: $('registerPasswordConfirm').value,
+        rol: $('registerRole').value
+      })
+    });
+    accountCreated = true;
+    const data = await request('/auth/login/', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+    saveSession(data, email);
+    window.location.href = 'index.html';
+  } catch (error) {
+    alertMessage(accountCreated
+      ? `La cuenta se creó, pero no se pudo iniciar sesión: ${error.message}`
+      : error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Crear cuenta';
   }
 });
 

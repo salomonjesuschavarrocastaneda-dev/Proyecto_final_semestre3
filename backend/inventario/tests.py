@@ -160,19 +160,49 @@ class InventoryApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue(User.objects.filter(pk=self.admin.pk).exists())
 
-    def test_public_registration_is_disabled(self):
+    def test_public_registration_creates_employee_account(self):
         response = self.client.post(
             "/api/auth/register/",
             {
-                "nombre": "Registro público",
+                "nombre": "Empleado público",
                 "email": "public@example.test",
                 "password": "AnotherUnitTestPassword!246",
                 "password_confirm": "AnotherUnitTestPassword!246",
+                "rol": "Empleado",
             },
             format="json",
         )
-        self.assertEqual(response.status_code, 401)
-        self.assertFalse(User.objects.filter(email="public@example.test").exists())
+        self.assertEqual(response.status_code, 201)
+        user = User.objects.get(email="public@example.test")
+        self.assertFalse(user.is_staff)
+        self.assertEqual(user.perfil_inventario.rol, "Empleado")
+        login_response = self.client.post(
+            "/api/auth/login/",
+            {
+                "email": "public@example.test",
+                "password": "AnotherUnitTestPassword!246",
+            },
+            format="json",
+        )
+        self.assertEqual(login_response.status_code, 200)
+        self.assertTrue(Token.objects.filter(key=login_response.data["token"]).exists())
+
+    def test_public_registration_can_create_administrator_account(self):
+        response = self.client.post(
+            "/api/auth/register/",
+            {
+                "nombre": "Administrador público",
+                "email": "admin.public@example.test",
+                "password": "AnotherUnitTestPassword!246",
+                "password_confirm": "AnotherUnitTestPassword!246",
+                "rol": "Administrador",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        user = User.objects.get(email="admin.public@example.test")
+        self.assertTrue(user.is_staff)
+        self.assertEqual(user.perfil_inventario.rol, "Administrador")
 
     def test_admin_creates_product_with_inventory_details(self):
         self.authenticate(self.admin)

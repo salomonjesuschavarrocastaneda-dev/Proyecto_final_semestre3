@@ -103,13 +103,8 @@ def logout_view(request):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def register_view(request):
-    if not is_inventory_admin(request.user):
-        return Response(
-            {"detail": "Solo un administrador puede crear usuarios."},
-            status=status.HTTP_403_FORBIDDEN,
-        )
     serializer = UserCreateSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.save()

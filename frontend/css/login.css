@@ -14,3 +14,17 @@
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(8, 24, 60, 0.2);
 }
+
+.field select {
+  width: 100%;
+  border: 1px solid #dce3ee;
+  border-radius: 9px;
+  padding: 12px 13px;
+  background: #fff;
+  color: #1c2940;
+}
+
+.field select:focus {
+  border-color: #507bd4;
+  box-shadow: 0 0 0 3px #507bd41c;
+}

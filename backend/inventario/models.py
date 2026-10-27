@@ -53,7 +53,15 @@ class Producto(models.Model):
 class Movimiento(models.Model):
     TIPOS = [("entrada", "Entrada"), ("salida", "Salida"), ("ajuste", "Ajuste")]
     referencia = models.CharField(max_length=40, unique=True, blank=True)
-    producto = models.ForeignKey(Producto, on_delete=models.PROTECT, related_name="movimientos")
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="movimientos",
+    )
+    producto_codigo_historico = models.CharField(max_length=40, blank=True, default="")
+    producto_nombre_historico = models.CharField(max_length=180, blank=True, default="")
     tipo = models.CharField(max_length=10, choices=TIPOS)
     cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     stock_anterior = models.PositiveIntegerField(default=0)
@@ -63,7 +71,9 @@ class Movimiento(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="movimientos_inventario")
     creado = models.DateTimeField(auto_now_add=True)
     class Meta: ordering = ["-creado"]
-    def __str__(self): return f"{self.referencia} · {self.producto.nombre}"
+    def __str__(self):
+        nombre = self.producto.nombre if self.producto else self.producto_nombre_historico
+        return f"{self.referencia} · {nombre}"
 
 
 class Venta(models.Model):
@@ -95,7 +105,16 @@ class Venta(models.Model):
 
 class DetalleVenta(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name="detalles")
-    producto = models.ForeignKey(Producto, on_delete=models.PROTECT, related_name="detalles_venta")
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="detalles_venta",
+    )
+    producto_codigo_historico = models.CharField(max_length=40, blank=True, default="")
+    producto_nombre_historico = models.CharField(max_length=180, blank=True, default="")
+    categoria_nombre_historica = models.CharField(max_length=100, blank=True, default="")
     cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     precio_unitario = models.DecimalField(max_digits=14, decimal_places=2)
 

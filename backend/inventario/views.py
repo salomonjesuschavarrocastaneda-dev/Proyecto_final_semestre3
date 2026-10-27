@@ -183,17 +183,8 @@ class ProductoViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         product = self.get_object()
-        if product.movimientos.exists():
-            return Response(
-                {
-                    "detail": (
-                        "No se puede eliminar este producto porque tiene movimientos "
-                        "asociados."
-                    )
-                },
-                status=status.HTTP_409_CONFLICT,
-            )
-        return super().destroy(request, *args, **kwargs)
+        self.perform_destroy(product)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -212,7 +203,12 @@ class MovimientoViewSet(viewsets.GenericViewSet):
     serializer_class = MovimientoSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["referencia", "producto__nombre", "observacion"]
+    search_fields = [
+        "referencia",
+        "producto__nombre",
+        "producto_nombre_historico",
+        "observacion",
+    ]
     ordering_fields = ["fecha", "creado", "tipo"]
 
     def get_queryset(self):
@@ -346,7 +342,7 @@ class SolicitudAyudaViewSet(viewsets.GenericViewSet):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def dashboard_view(_request):
-    products = Producto.objects.all()
+    products = Producto.objects.filter(estado="activo")
     movements = Movimiento.objects.filter(
         fecha__gte=timezone.localdate() - timezone.timedelta(days=6)
     )

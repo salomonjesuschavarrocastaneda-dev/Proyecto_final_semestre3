@@ -65,6 +65,20 @@ La ejecución que se capturó para la Entrega 3 encontró 23 pruebas y terminó 
 - Una prueba útil de persistencia es crear un producto de prueba, cerrar sesión y volver a entrar; para comprobar reinicio de servicio, detener Django con `Ctrl+C`, iniciarlo de nuevo contra la misma base y consultar el producto de nuevo.
 
 ## Endpoints principales
+<<<<<<< Updated upstream
+=======
+- `POST /api/auth/register/` — creación de cuenta solo para administradores autenticados.
+- `POST /api/auth/login/` — recibe `{ "email": "...", "password": "..." }`, devuelve token y usuario.
+- `POST /api/auth/logout/` — revoca el token de la sesión autenticada.
+- `POST /api/auth/password-reset/` — solicita recuperación; para envío real configura EMAIL en Django.
+- `GET/POST /api/productos/`, `GET/PUT/PATCH/DELETE /api/productos/{id}/`. Solo administradores crean, editan y eliminan productos; empleados pueden consultarlos y registrar movimientos. `DELETE` elimina físicamente el producto. Las ventas y los movimientos históricos permanecen guardados con una copia del código y nombre del producto (y la categoría en los detalles de venta), aunque ya no queden vinculados al producto eliminado.
+- `GET/POST /api/categorias/` y `/api/categorias/{id}/`. La escritura está reservada al administrador.
+- `GET /api/movimientos/`; `POST /api/movimientos/registrar/` para entrada, salida o ajuste.
+- `GET/POST /api/ventas/`, `GET /api/ventas/{id}/` — consultar ventas propias o de todo el equipo (administrador) y registrar ventas con varios productos.
+- `GET/POST /api/ayuda/`, `GET /api/ayuda/{id}/`, `POST /api/ayuda/{id}/mensajes/` — conversaciones internas; usuarios ven las propias y administradores atienden la bandeja. `POST /api/ayuda/{id}/cerrar/` es solo administrador.
+- `GET /api/dashboard/` — indicadores.
+- `GET/POST /api/usuarios/` y `DELETE /api/usuarios/{id}/` — solo administrador. La creación permite asignar los roles Administrador o Empleado.
+>>>>>>> Stashed changes
 
 - `POST /api/auth/login/`: recibe correo y contraseña; devuelve token y usuario.
 - `POST /api/auth/logout/`: revoca el token de la sesión autenticada.

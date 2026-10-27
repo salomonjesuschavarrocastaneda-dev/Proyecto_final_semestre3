@@ -5,7 +5,7 @@ from django.test import TestCase
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
-from .models import Categoria, Movimiento, Producto, Venta
+from .models import Categoria, DetalleVenta, Movimiento, Producto, Venta
 
 User = get_user_model()
 
@@ -238,6 +238,91 @@ class InventoryApiTests(TestCase):
         self.assertEqual(movement.stock_anterior, 10)
         self.assertEqual(movement.stock_nuevo, 6)
         self.assertEqual(movement.usuario, self.admin)
+
+    def test_admin_deletes_product_and_preserves_inventory_and_sales_history(self):
+        self.authenticate(self.admin)
+        response = self.client.post(
+            "/api/ventas/",
+            {
+                "forma_pago": "efectivo",
+                "detalles": [{"producto": self.product.id, "cantidad": 1}],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201, response.data)
+        sale_id = response.data["id"]
+        movement_ids = list(
+            Movimiento.objects.filter(producto=self.product).values_list("id", flat=True)
+        )
+
+        response = self.client.delete(f"/api/productos/{self.product.id}/")
+        self.assertEqual(response.status_code, 204)
+
+        self.assertFalse(Producto.objects.filter(pk=self.product.pk).exists())
+        self.assertCountEqual(
+            Movimiento.objects.filter(producto__isnull=True).values_list("id", flat=True),
+            movement_ids,
+        )
+        sale_details = self.client.get(f"/api/ventas/{sale_id}/").data["detalles"]
+        self.assertEqual(len(sale_details), 1)
+        self.assertIsNone(sale_details[0]["producto"])
+        self.assertEqual(sale_details[0]["producto_nombre"], "Producto de prueba")
+        self.assertEqual(sale_details[0]["producto_codigo"], "TEST-1")
+        self.assertEqual(sale_details[0]["categoria_nombre"], "Prueba")
+        self.assertTrue(
+            DetalleVenta.objects.filter(
+                venta_id=sale_id,
+                producto__isnull=True,
+                producto_nombre_historico="Producto de prueba",
+            ).exists()
+        )
+        movement_response = self.client.get("/api/movimientos/")
+        self.assertTrue(
+            any(
+                movement["producto_nombre"] == "Producto de prueba"
+                for movement in movement_response.data
+            )
+        )
+        self.assertFalse(Producto.objects.filter(pk=self.product.pk).exists())
+        response = self.client.post(
+            "/api/ventas/",
+            {
+                "forma_pago": "efectivo",
+                "detalles": [{"producto": self.product.id, "cantidad": 1}],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        dashboard = self.client.get("/api/dashboard/").data
+        self.assertEqual(
+            dashboard["total_productos"],
+            Producto.objects.filter(estado="activo").count(),
+        )
+        self.assertFalse(
+            Producto.objects.filter(pk=self.product.pk, estado="activo").exists()
+        )
+        self.assertEqual(dashboard["unidades"], 0)
+        self.assertEqual(str(dashboard["valor_inventario"]), "0")
+
+    def test_inactive_product_cannot_receive_new_inventory_movements(self):
+        self.authenticate(self.admin)
+        self.product.estado = "inactivo"
+        self.product.save(update_fields=["estado"])
+
+        response = self.client.post(
+            "/api/movimientos/registrar/",
+            {
+                "producto": self.product.id,
+                "tipo": "entrada",
+                "cantidad": 1,
+                "fecha": date.today().isoformat(),
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("inactivo", str(response.data).lower())
+        self.assertEqual(self.product.movimientos.count(), 0)
 
     def test_admin_can_reactivate_category_without_losing_its_products(self):
         self.authenticate(self.admin)

@@ -84,6 +84,8 @@ class ProductoSerializer(serializers.ModelSerializer):
             Movimiento.objects.create(
                 referencia=f"MOV-{created_at:%Y%m%d%H%M%S%f}",
                 producto=product,
+                producto_codigo_historico=product.codigo,
+                producto_nombre_historico=product.nombre,
                 tipo="entrada",
                 cantidad=initial_stock,
                 stock_anterior=0,
@@ -114,6 +116,8 @@ class ProductoSerializer(serializers.ModelSerializer):
             Movimiento.objects.create(
                 referencia=f"MOV-{uuid.uuid4().hex[:32].upper()}",
                 producto=product,
+                producto_codigo_historico=product.codigo,
+                producto_nombre_historico=product.nombre,
                 tipo="ajuste",
                 cantidad=abs(new_stock - previous_stock),
                 stock_anterior=previous_stock,
@@ -133,7 +137,7 @@ class ProductoSerializer(serializers.ModelSerializer):
 
 
 class MovimientoSerializer(serializers.ModelSerializer):
-    producto_nombre = serializers.CharField(source="producto.nombre", read_only=True)
+    producto_nombre = serializers.SerializerMethodField()
     producto_id = serializers.IntegerField(source="producto.id", read_only=True)
     usuario_nombre = serializers.SerializerMethodField()
 
@@ -172,9 +176,23 @@ class MovimientoSerializer(serializers.ModelSerializer):
             else "Sistema"
         )
 
+    def get_producto_nombre(self, obj):
+        return (
+            obj.producto.nombre
+            if obj.producto
+            else obj.producto_nombre_historico or "Producto eliminado"
+        )
+
     def validate_cantidad(self, value):
         if value < 1:
             raise serializers.ValidationError("La cantidad debe ser mayor que cero.")
+        return value
+
+    def validate_producto(self, value):
+        if value.estado != "activo":
+            raise serializers.ValidationError(
+                "No se pueden registrar movimientos para un producto inactivo."
+            )
         return value
 
     @transaction.atomic
@@ -221,6 +239,8 @@ class MovimientoSerializer(serializers.ModelSerializer):
         return Movimiento.objects.create(
             **validated_data,
             referencia=f"MOV-{timezone.now():%Y%m%d%H%M%S%f}",
+            producto_codigo_historico=validated_data["producto"].codigo,
+            producto_nombre_historico=validated_data["producto"].nombre,
             stock_anterior=anterior,
             stock_nuevo=nuevo,
             usuario=(
@@ -232,12 +252,9 @@ class MovimientoSerializer(serializers.ModelSerializer):
 
 
 class DetalleVentaSerializer(serializers.ModelSerializer):
-    producto_nombre = serializers.CharField(source="producto.nombre", read_only=True)
-    producto_codigo = serializers.CharField(source="producto.codigo", read_only=True)
-    categoria_nombre = serializers.CharField(
-        source="producto.categoria.nombre",
-        read_only=True,
-    )
+    producto_nombre = serializers.SerializerMethodField()
+    producto_codigo = serializers.SerializerMethodField()
+    categoria_nombre = serializers.SerializerMethodField()
     subtotal = serializers.DecimalField(
         max_digits=16,
         decimal_places=2,
@@ -257,6 +274,27 @@ class DetalleVentaSerializer(serializers.ModelSerializer):
             "subtotal",
         ]
         read_only_fields = ["precio_unitario", "subtotal"]
+
+    def get_producto_nombre(self, obj):
+        return (
+            obj.producto.nombre
+            if obj.producto
+            else obj.producto_nombre_historico or "Producto eliminado"
+        )
+
+    def get_producto_codigo(self, obj):
+        return (
+            obj.producto.codigo
+            if obj.producto
+            else obj.producto_codigo_historico
+        )
+
+    def get_categoria_nombre(self, obj):
+        return (
+            obj.producto.categoria.nombre
+            if obj.producto
+            else obj.categoria_nombre_historica
+        )
 
 
 class VentaSerializer(serializers.ModelSerializer):
@@ -350,6 +388,9 @@ class VentaSerializer(serializers.ModelSerializer):
             DetalleVenta.objects.create(
                 venta=sale,
                 producto=product,
+                producto_codigo_historico=product.codigo,
+                producto_nombre_historico=product.nombre,
+                categoria_nombre_historica=product.categoria.nombre,
                 cantidad=quantity,
                 precio_unitario=product.precio,
             )
@@ -357,6 +398,8 @@ class VentaSerializer(serializers.ModelSerializer):
             Movimiento.objects.create(
                 referencia=movement_reference,
                 producto=product,
+                producto_codigo_historico=product.codigo,
+                producto_nombre_historico=product.nombre,
                 tipo="salida",
                 cantidad=quantity,
                 stock_anterior=stock_before,

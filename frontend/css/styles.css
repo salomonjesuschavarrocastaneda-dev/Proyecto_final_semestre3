@@ -109,3 +109,4 @@ html, body { width: 100%; min-height: 100%; }
   .sale-cart-line { grid-template-columns: minmax(0,1fr) auto; }
   .sale-cart-line button { grid-column: 1 / -1; justify-self: start; }
 }
+.metric-value-inventory { font-size: clamp(17px, 1.65vw, 23px); letter-spacing: -.045em; overflow-wrap: anywhere; }

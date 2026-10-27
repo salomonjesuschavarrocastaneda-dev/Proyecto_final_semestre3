@@ -61,6 +61,7 @@ La validación del navegador mejora el mensaje mostrado al usuario, pero las com
 Resultados de la auditoría actual:
 
 - `python manage.py check`: `System check identified no issues`.
+- `python manage.py makemigrations --check --dry-run`: `No changes detected`; all four inventory migrations were applied.
 - `python manage.py test inventario`: `Found 29 test(s)`; `Ran 29 tests in 4230.844s`; `OK`.
 - El test runner creó y destruyó una base temporal. La configuración activa apuntó a MySQL; la base de trabajo no se eliminó.
 - La suite incluye pruebas de autenticación, endpoints protegidos, permisos de empleados y administradores, creación y edición de productos, movimientos, ventas con varios productos, insuficiencia de stock, categorías, centro de ayuda y eliminación física con conservación del historial.
@@ -90,7 +91,12 @@ Repositorio oficial: https://github.com/salomonjesuschavarrocastaneda-dev/Proyec
 
 En la auditoría, la rama local es `main`, coincide con `origin/main` y no había cambios locales antes de comenzar la revisión. El flujo recomendado del repositorio es rama de trabajo → commits descriptivos → Pull Request → revisión → merge.
 
-Último commit remoto observado al iniciar la auditoría: `2bc51b0` — `fix: completar validaciones y mejoras del inventario`. La evidencia gráfica del historial de commits aún debe capturarse en GitHub para el PDF.
+Último commit remoto observado al iniciar la auditoría: `2bc51b0` — `fix: completar validaciones y mejoras del inventario`. Durante esta auditoría se prepararon:
+
+- `4cb3d65` — `fix: improve inventory error handling and validation coverage`.
+- `457c3fe` — `docs: update Entrega 3 audit and test evidence`.
+
+La evidencia gráfica del historial de commits aún debe capturarse en GitHub para el PDF.
 
 El archivo `.gitignore` excluye `.env`, entornos virtuales, cachés, logs y la base SQLite local. Las credenciales reales no se incluyen en Git.
 

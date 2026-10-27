@@ -102,7 +102,8 @@ La ejecución actual registrada encontró 29 pruebas y finalizó con `Ran 29 tes
 Usa ramas de funcionalidad, commits descriptivos y Pull Requests para respetar el flujo colaborativo del proyecto. No subas `.env`, contraseñas ni archivos de datos privados. Comprueba `git status` antes de hacer commit y revisa el diff.
 
 - Repositorio: https://github.com/salomonjesuschavarrocastaneda-dev/Proyecto_final_semestre3
-- Rama de trabajo de la entrega: `entrega3-refinamiento`, integrada a `main` mediante el Pull Request #9.
+- La rama principal es `main`; la Entrega 3 se integró mediante el Pull Request #9 y continuó con cambios posteriores en esa rama.
+- Auditoría local del 27 de octubre de 2026: commits `4cb3d65` (validaciones y cobertura) y `457c3fe` (documentación y matriz de pruebas).
 
 ## Tecnologías
 

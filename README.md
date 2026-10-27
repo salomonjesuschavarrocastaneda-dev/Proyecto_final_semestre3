@@ -107,3 +107,14 @@ Usa ramas de funcionalidad, commits descriptivos y Pull Requests para respetar e
 ## Tecnologías
 
 HTML · CSS · JavaScript · Python · Django · Django REST Framework · MySQL · MySQL Workbench · Git · GitHub
+
+
+## Organización del equipo y flujo colaborativo
+
+El trabajo se organiza por responsabilidades coordinadas:
+
+- **Frontend:** interfaz, formularios, tablas y comunicación con la API en `frontend/`.
+- **Backend:** modelos, serializers, permisos, endpoints y reglas de negocio en `backend/`.
+- **Base de datos:** modelo relacional, consultas y script de referencia en `database/`.
+
+El flujo sugerido es `rama de trabajo → commits descriptivos → Pull Request → revisión → merge`. Mantén `main` como rama estable y coordina los cambios que afecten a más de un grupo. Cada integrante debe registrar sus propios aportes desde su cuenta; no se deben inventar ni atribuir commits de otro integrante.

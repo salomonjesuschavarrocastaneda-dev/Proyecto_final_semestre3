@@ -53,7 +53,7 @@ python manage.py check
 python manage.py test inventario
 ```
 
-La ejecución que se capturó para la Entrega 3 encontró 23 pruebas y terminó con `OK`. La suite de Django crea una base de datos temporal para probar y la elimina al finalizar; no debe borrar ni cambiar la base de datos de trabajo. Repite las pruebas después de modificar código y conserva la salida real de consola como evidencia.
+La auditoría local del 27 de octubre de 2026 encontró 29 pruebas y terminó con `Ran 29 tests ... OK`, usando el motor MySQL configurado. La suite de Django crea una base de datos temporal para probar y la elimina al finalizar; no borra la base de datos de trabajo. Repite las pruebas después de modificar código y conserva la salida real de consola como evidencia.
 
 ## Persistencia, validaciones y manejo de errores
 
@@ -65,8 +65,6 @@ La ejecución que se capturó para la Entrega 3 encontró 23 pruebas y terminó 
 - Una prueba útil de persistencia es crear un producto de prueba, cerrar sesión y volver a entrar; para comprobar reinicio de servicio, detener Django con `Ctrl+C`, iniciarlo de nuevo contra la misma base y consultar el producto de nuevo.
 
 ## Endpoints principales
-<<<<<<< Updated upstream
-=======
 - `POST /api/auth/register/` — creación de cuenta solo para administradores autenticados.
 - `POST /api/auth/login/` — recibe `{ "email": "...", "password": "..." }`, devuelve token y usuario.
 - `POST /api/auth/logout/` — revoca el token de la sesión autenticada.
@@ -78,20 +76,7 @@ La ejecución que se capturó para la Entrega 3 encontró 23 pruebas y terminó 
 - `GET/POST /api/ayuda/`, `GET /api/ayuda/{id}/`, `POST /api/ayuda/{id}/mensajes/` — conversaciones internas; usuarios ven las propias y administradores atienden la bandeja. `POST /api/ayuda/{id}/cerrar/` es solo administrador.
 - `GET /api/dashboard/` — indicadores.
 - `GET/POST /api/usuarios/` y `DELETE /api/usuarios/{id}/` — solo administrador. La creación permite asignar los roles Administrador o Empleado.
->>>>>>> Stashed changes
-
-- `POST /api/auth/login/`: recibe correo y contraseña; devuelve token y usuario.
-- `POST /api/auth/logout/`: revoca el token de la sesión autenticada.
-- `POST /api/auth/register/`: creación de cuentas solo para administradores autenticados.
-- `POST /api/auth/password-reset/`: solicitud de recuperación; requiere configurar SMTP para enviar correos.
-- `GET/POST /api/productos/` y `/api/productos/{id}/`: consulta y administración de productos, según permisos.
-- `GET/POST /api/categorias/` y `/api/categorias/{id}/`: categorías.
-- `GET /api/movimientos/`; `POST /api/movimientos/registrar/`: entradas, salidas o ajustes.
-- `GET/POST /api/ventas/`: ventas con varios productos, cálculo del total y descuento de existencias.
-- `GET/POST /api/ayuda/`, `/api/ayuda/{id}/mensajes/`: centro de ayuda interno.
-- `GET /api/dashboard/`: indicadores.
-- `GET/POST /api/usuarios/`, `DELETE /api/usuarios/{id}/`: solo administrador.
-- `GET /health/`: comprobación básica del servicio.
+- `GET /health/` — comprobación básica del servicio.
 
 ## Correo y seguridad
 

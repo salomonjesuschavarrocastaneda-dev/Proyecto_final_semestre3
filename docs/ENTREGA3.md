@@ -4,8 +4,15 @@
 **Institución:** Fundación Escuela Tecnológica de Neiva — Jesús Oviedo Pérez (FET)  
 **Programa:** Ingeniería de Software  
 **Asignaturas:** Lenguaje de Programación 1 e Introducción a las Bases de Datos  
-**Líder del proyecto:** Salomón Jesús Chavarro Castañeda  
-**Ciudad y año:** Neiva, Huila, Colombia — 2026  
+**Líder del proyecto:** Salomón Jesús Chavarro Castañeda
+
+**Integrantes y códigos:** [Completar nombres y códigos de todo el equipo]
+
+**Asignatura y grupo:** [Completar asignatura y grupo]
+
+**Fecha de entrega:** [Completar fecha]
+
+**Ciudad y año:** Neiva, Huila, Colombia — 2026
 **Repositorio:** https://github.com/salomonjesuschavarrocastaneda-dev/Proyecto_final_semestre3
 
 ## 1. Propósito
@@ -20,11 +27,11 @@ La solución utiliza tres capas:
 2. **Backend:** Python, Django y Django REST Framework en `backend/`. Controla autenticación, permisos, validaciones, reglas de negocio y operaciones transaccionales.
 3. **Base de datos:** MySQL, configurado mediante las variables privadas de `backend/.env`. Django ORM conserva productos, categorías, movimientos, ventas, usuarios y solicitudes de ayuda.
 
-El navegador no se conecta directamente con MySQL. Las escrituras se realizan a través de la API, de modo que los permisos y validaciones se aplican en el servidor. Las migraciones registradas para inventario son `0001_initial`, `0002_producto_fecha_caducidad_producto_lote_and_more` y `0003_solicitudayuda_mensajeayuda_venta_detalleventa`; las tres aparecían aplicadas en la evidencia local.
+El navegador no se conecta directamente con MySQL. Las escrituras se realizan a través de la API, de modo que los permisos y validaciones se aplican en el servidor. En la auditoría local se confirmó la conexión MySQL configurada en `backend/.env` y que las migraciones `0001_initial`, `0002_producto_fecha_caducidad_producto_lote_and_more`, `0003_solicitudayuda_mensajeayuda_venta_detalleventa` y `0004_product_deletion_history` están aplicadas.
 
 ### Evidencia de persistencia registrada
 
-En la verificación local se confirmó que Django conectaba a MySQL y se consultaron los siguientes conteos:
+El registro anterior del proyecto contiene este conteo histórico, que no se volvió a consultar durante esta auditoría:
 
 | Entidad | Registros que mostró la consulta |
 |---|---:|
@@ -32,7 +39,7 @@ En la verificación local se confirmó que Django conectaba a MySQL y se consult
 | Categorías | 6 |
 | Movimientos | 10 |
 
-Las capturas incluidas en el PDF de evidencia muestran productos recuperados en el módulo de inventario después de cerrar sesión y volver a ingresar. Para una comprobación adicional de reinicio del servicio, detener Django con `Ctrl+C`, iniciarlo otra vez contra la misma base y consultar de nuevo el registro de prueba.
+No hay capturas de la aplicación o de la consola en el repositorio. Deben incorporarse al PDF de entrega después de realizar la verificación manual de reinicio y recarga; esta auditoría no afirma que dicha prueba manual se haya repetido.
 
 ## 3. Validaciones y manejo de errores
 
@@ -47,48 +54,43 @@ Las validaciones se distribuyen entre el navegador y la API. Las validaciones vi
 - **Permisos:** productos y categorías solo los modifica un administrador; los ajustes de stock y la gestión de usuarios están restringidos por rol.
 - **Fallos del formulario:** se añadió validación HTML personalizada para mostrar mensajes más claros de campos obligatorios, entradas numéricas, mínimos, máximos y formatos.
 
-### Observación de CP-01
-
-La captura inicial del campo numérico mostraba que el navegador impedía escribir letras, pero el mensaje visible no era suficientemente específico. En la rama `entrega3-refinamiento` se añadió un manejador de validación de formularios para dar mensajes más claros. **La verificación visual final de este cambio debe repetirse en el navegador local después de actualizar la rama**; no se afirma que esta revisión visual se haya ejecutado en el entorno remoto.
+La validación del navegador mejora el mensaje mostrado al usuario, pero las comprobaciones del servidor son las que protegen la persistencia. La verificación visual de los formularios y la captura de consola quedan pendientes; no se presentan como pruebas automatizadas.
 
 ## 4. Pruebas automatizadas
 
-En la ejecución documentada desde el entorno local:
+Resultados de la auditoría actual:
 
 - `python manage.py check`: `System check identified no issues`.
-- `python manage.py test inventario`: se encontraron 23 pruebas y el resultado fue `OK`.
-- La suite cubre autenticación, endpoints protegidos, permisos de empleados y administradores, creación y edición de productos, movimientos, ventas con varios productos, insuficiencia de stock, categorías y centro de ayuda.
-- Django creó una base de datos temporal para las pruebas y la eliminó al terminar. Esto no elimina los datos de la base de trabajo.
+- `python manage.py test inventario`: `Found 29 test(s)`; `Ran 29 tests in 4230.844s`; `OK`.
+- El test runner creó y destruyó una base temporal. La configuración activa apuntó a MySQL; la base de trabajo no se eliminó.
+- La suite incluye pruebas de autenticación, endpoints protegidos, permisos de empleados y administradores, creación y edición de productos, movimientos, ventas con varios productos, insuficiencia de stock, categorías, centro de ayuda y eliminación física con conservación del historial.
 
 Estos resultados corresponden a la captura de ejecución. Repite las pruebas después de cualquier modificación local antes de presentar una nueva evidencia.
 
 ## 5. Matriz de pruebas funcionales (CP-01 a CP-10)
 
-Los resultados abajo corresponden a las pruebas manuales documentadas en el archivo de evidencia entregado. CP-01 se registra con observación debido al mensaje poco específico observado antes del cambio de validación; debe volver a verificarse con la versión actualizada.
+La ejecución automatizada completa terminó con 29 pruebas aprobadas. La tabla registra los escenarios automatizados cubiertos; las pruebas visuales/manuales (incluidas las capturas para el PDF final) siguen pendientes y no se presentan como realizadas.
 
-| Código | Caso de prueba | Datos de entrada / escenario | Resultado esperado | Resultado obtenido | Bug / corrección | Responsable |
+| Código | Caso de prueba | Datos de entrada | Resultado esperado | Resultado obtenido | Corrección aplicada | Responsable |
 |---|---|---|---|---|---|---|
-| CP-01 | Texto en campo numérico | Intentar introducir `abc` en stock/cantidad | Rechazo del dato y mensaje claro | El navegador impedía las letras; el mensaje inicial no era específico | Se añadió validación HTML con mensajes propios (commit `5e66307`). Pendiente revalidación visual local tras actualizar | Salomón Jesús Chavarro Castañeda |
-| CP-02 | Precio negativo | Precio `-100` | Rechazar precio menor que cero | La validación del campo impidió el valor negativo | No se reportó otra corrección | Salomón Jesús Chavarro Castañeda |
-| CP-03 | Campo obligatorio | Nombre vacío | Solicitar completar el nombre y no guardar | El formulario indicó que el campo era obligatorio | No se reportó otra corrección | Salomón Jesús Chavarro Castañeda |
-| CP-04 | Código duplicado | Reutilizar el código de un producto existente | Rechazar el registro duplicado | Se mostró el mensaje de código existente | No se reportó otra corrección | Salomón Jesús Chavarro Castañeda |
-| CP-05 | Cantidad negativa | Cantidad `-5` | Rechazar cantidad no positiva | El navegador rechazó la cantidad inválida | No se reportó otra corrección | Salomón Jesús Chavarro Castañeda |
-| CP-06 | Stock insuficiente | Salida de 10 cuando hay 5 unidades | Rechazar salida y conservar existencias | La API mostró “Stock insuficiente. Disponible: 5.” | No se reportó otra corrección | Salomón Jesús Chavarro Castañeda |
-| CP-07 | Persistencia | Registrar `PERSIST001`, cerrar sesión e ingresar otra vez | El registro debe seguir disponible | El producto volvió a aparecer después de iniciar sesión nuevamente | No se reportó otra corrección | Salomón Jesús Chavarro Castañeda |
-| CP-08 | Consulta de registros | Abrir Productos y buscar un registro guardado | Recuperar los datos guardados | El producto y sus campos aparecieron en el listado/formulario | No se reportó otra corrección | Salomón Jesús Chavarro Castañeda |
-| CP-09 | Formato / campo inválido | Dejar un campo obligatorio sin valor | Mostrar validación y permitir corrección | El formulario indicó que el campo debía completarse | Se añadió validación HTML personalizada como mejora de claridad; revalidar con el código actualizado | Salomón Jesús Chavarro Castañeda |
-| CP-10 | Eliminación | Crear registro exclusivo de prueba y eliminarlo si está permitido | Quitar el registro; conservar restricciones históricas | La interfaz solicitó confirmación y mostró mensaje de eliminación | No se reportó otra corrección | Salomón Jesús Chavarro Castañeda |
+| CP-01 | Registro válido de producto | Código nuevo, nombre, categoría activa y precio válido | HTTP 201; producto y movimiento inicial persistidos | Automatizada: aprobada en la ejecución de 29 pruebas | `test_admin_creates_product_with_inventory_details` | Salomón Jesús Chavarro Castañeda |
+| CP-02 | Precio negativo | Crear producto con precio `-1.00` | HTTP 400; no crear producto | Automatizada: aprobada en la ejecución de 29 pruebas | `test_admin_rejects_invalid_product_price_and_stock` | Salomón Jesús Chavarro Castañeda |
+| CP-03 | Cantidad/stock inválido | Stock `-1`; movimiento con `0`, `-1` o texto | HTTP 400; stock sin cambios | Automatizada: aprobada en la ejecución de 29 pruebas | Pruebas de rechazo de stock y `test_invalid_movement_quantity_and_date_return_controlled_errors` | Salomón Jesús Chavarro Castañeda |
+| CP-04 | Campos obligatorios vacíos | Código, nombre o categoría faltantes/vacíos | HTTP 400; no crear producto | Automatizada: aprobada en la ejecución de 29 pruebas | `test_admin_rejects_empty_required_product_fields` | Salomón Jesús Chavarro Castañeda |
+| CP-05 | Código duplicado | Reutilizar un código existente | HTTP 400; conservar único el registro original | Automatizada: aprobada en la ejecución de 29 pruebas | `test_admin_rejects_duplicate_product_code` | Salomón Jesús Chavarro Castañeda |
+| CP-06 | Salida con stock insuficiente | Solicitar salida superior al stock | HTTP 400; stock intacto y movimiento no creado | Automatizada: aprobada en la ejecución de 29 pruebas | `test_exit_movement_cannot_overdraw` | Salomón Jesús Chavarro Castañeda |
+| CP-07 | Persistencia de producto | Crear y consultar el producto por la API | El producto guardado aparece en la consulta | Automatizada: aprobada en la ejecución de 29 pruebas | Lectura posterior comprobada en `test_admin_creates_product_with_inventory_details` | Salomón Jesús Chavarro Castañeda |
+| CP-08 | Autenticación | Consultar endpoints protegidos sin token | HTTP 401 | Automatizada: aprobada en la ejecución de 29 pruebas | `test_protected_endpoints_reject_anonymous_requests` | Salomón Jesús Chavarro Castañeda |
+| CP-09 | Permisos por rol | Empleado intenta modificar catálogo o ajustar stock | HTTP 403; sin cambios | Automatizada: aprobada en la ejecución de 29 pruebas | `test_employee_cannot_manage_catalog_or_users` | Salomón Jesús Chavarro Castañeda |
+| CP-10 | Error controlado y borrado | Fecha/cantidad inválida; borrado físico con historial | HTTP 400 en entrada inválida; al borrar, el producto desaparece y ventas/movimientos se conservan | Automatizada: aprobada en la ejecución de 29 pruebas | `test_invalid_movement_quantity_and_date_return_controlled_errors` y `test_admin_deletes_product_and_preserves_inventory_and_sales_history` | Salomón Jesús Chavarro Castañeda |
 
 ## 6. Control de versiones
 
 Repositorio oficial: https://github.com/salomonjesuschavarrocastaneda-dev/Proyecto_final_semestre3
 
-Para esta etapa se creó la rama `entrega3-refinamiento` a partir de `main`. Los cambios de esta rama incluyen commits separados para la validación de formularios y la documentación. El flujo recomendado del repositorio es rama de trabajo → commits descriptivos → Pull Request → revisión → merge.
+En la auditoría, la rama local es `main`, coincide con `origin/main` y no había cambios locales antes de comenzar la revisión. El flujo recomendado del repositorio es rama de trabajo → commits descriptivos → Pull Request → revisión → merge.
 
-Extracto de trazabilidad:
-- `8f37208` — `fix: complete inventory editing and sales flow` (commit previo existente en main).
-- `5e66307` — `fix: mostrar mensajes claros en validaciones de formularios`.
-- Los commits de documentación agregan las instrucciones de ejecución, persistencia, pruebas y esta memoria técnica.
+Último commit remoto observado al iniciar la auditoría: `2bc51b0` — `fix: completar validaciones y mejoras del inventario`. La evidencia gráfica del historial de commits aún debe capturarse en GitHub para el PDF.
 
 El archivo `.gitignore` excluye `.env`, entornos virtuales, cachés, logs y la base SQLite local. Las credenciales reales no se incluyen en Git.
 
@@ -105,6 +107,6 @@ Para comprobar persistencia en la base de trabajo, cree un producto de prueba, c
 
 ## 8. Conclusiones
 
-MAGNUSSIG SIG utiliza una arquitectura de tres capas con persistencia relacional mediante Django ORM y MySQL. La evidencia local documenta conexión a MySQL, migraciones aplicadas y 23 pruebas automatizadas aprobadas. Las pruebas funcionales cubren validaciones de campos, códigos duplicados, stock insuficiente, consulta, persistencia de sesión y eliminación permitida. Se detectó una oportunidad de mejora en la claridad del mensaje al intentar escribir texto en un campo numérico y se añadió una validación HTML personalizada en la rama de entrega; la comprobación visual final debe realizarse en el navegador después de sincronizar el cambio.
+MAGNUSSIG SIG utiliza una arquitectura de tres capas con persistencia relacional mediante Django ORM y MySQL. En esta auditoría se confirmó la conexión a MySQL, el estado de las migraciones y la coherencia de modelos. La auditoría de código, la conexión MySQL y las 29 pruebas automatizadas se verificaron localmente. La validación visual/manual y las capturas para el PDF final continúan pendientes.
 
 La entrega debe acompañarse de las capturas de consola y de la interfaz, la matriz de pruebas y la evidencia del historial de commits en GitHub.

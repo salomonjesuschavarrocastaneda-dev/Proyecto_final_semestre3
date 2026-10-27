@@ -4,7 +4,7 @@ Proyecto de aula de Ingeniería de Software de la Fundación Escuela Tecnológic
 
 ## Estado de la Entrega 3
 
-La entrega aborda refinamiento, validaciones, persistencia y manejo de errores. En la verificación local documentada el 26 de octubre de 2026, Django pasó `manage.py check` y **23 pruebas automatizadas de `inventario` terminaron con resultado `OK`**. La conexión a MySQL también se verificó localmente. Estos resultados corresponden a la ejecución documentada; vuelve a ejecutar las pruebas después de cualquier cambio de código.
+La entrega aborda refinamiento, validaciones, persistencia y manejo de errores. En la auditoría local del 27 de octubre de 2026, Django pasó `manage.py check`, la conexión configurada a MySQL respondió correctamente y **29 pruebas automatizadas de `inventario` terminaron con resultado `OK`**. Las cuatro migraciones de inventario estaban aplicadas y `makemigrations --check --dry-run` no detectó cambios.
 
 La matriz de pruebas y la explicación técnica se encuentran en [docs/ENTREGA3.md](docs/ENTREGA3.md).
 
@@ -95,7 +95,7 @@ python manage.py check
 python manage.py test inventario
 ```
 
-La ejecución registrada para la Entrega 3 encontró 23 pruebas y finalizó con `Ran 23 tests ... OK`. Django crea una base de pruebas separada y la destruye al finalizar; no significa que borre la base de datos de trabajo. Las pruebas manuales CP-01–CP-10, sus resultados y la observación de validación de formularios se documentan en [docs/ENTREGA3.md](docs/ENTREGA3.md).
+La ejecución actual registrada encontró 29 pruebas y finalizó con `Ran 29 tests ... OK` contra una base de pruebas temporal usando el motor MySQL configurado. Django destruye esa base temporal al finalizar; no borra los datos de trabajo. La matriz automatizada y las verificaciones manuales pendientes se documentan en [docs/ENTREGA3.md](docs/ENTREGA3.md).
 
 ## Git y contribución
 

@@ -199,8 +199,8 @@ function configureModalValidation(){
         const label=form.querySelector(`label[for="${control.id}"]`)?.textContent?.replace('*','').trim()||'Este campo';
         const showFriendlyMessage=()=>{
             let message='';
-            if(control.validity.valueMissing)message=`Completa el campo ${label.toLowerCase()}.`;
-            else if(control.validity.badInput)message=`Ingresa un valor válido para ${label.toLowerCase()}.`;
+            if(control.validity.badInput)message=`Ingresa un valor válido para ${label.toLowerCase()}.`;
+            else if(control.validity.valueMissing)message=`Completa el campo ${label.toLowerCase()}.`;
             else if(control.validity.rangeUnderflow)message=`${label}: el valor mínimo permitido es ${control.min}.`;
             else if(control.validity.rangeOverflow)message=`${label}: el valor máximo permitido es ${control.max}.`;
             else if(control.validity.stepMismatch)message=`${label}: ingresa un valor válido.`;
@@ -210,6 +210,21 @@ function configureModalValidation(){
         control.addEventListener('invalid',showFriendlyMessage);
         control.addEventListener('input',()=>control.setCustomValidity(''));
         control.addEventListener('change',()=>control.setCustomValidity(''));
+        if(control.type==='number'){
+            control.addEventListener('keydown',event=>{
+                if(!event.ctrlKey&&!event.metaKey&&!event.altKey&&event.key.length===1&&/[a-zA-Z]/.test(event.key)){
+                    event.preventDefault();
+                    toast(`Ingresa solo números para ${label.toLowerCase()}.`,'error');
+                }
+            });
+            control.addEventListener('paste',event=>{
+                const pasted=(event.clipboardData||window.clipboardData).getData('text').trim();
+                if(pasted&&!/^[+-]?(?:\\d+|\\d*[.,]\\d+)$/.test(pasted)){
+                    event.preventDefault();
+                    toast(`Ingresa solo números para ${label.toLowerCase()}.`,'error');
+                }
+            });
+        }
     });
 }
 function openModal(title,body,submitLabel='Guardar',onSubmit){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modalSubmit').textContent=submitLabel;$('modalFooter').hidden=false;$('modalBackdrop').hidden=false;configureModalValidation();$('modalForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target);const data=Object.fromEntries(fd.entries());try{await onSubmit(data);$('modalBackdrop').hidden=true;}catch(err){toast(err.message,'error');}};setTimeout(()=>$('modalBody').querySelector('input,select,textarea')?.focus(),50);}

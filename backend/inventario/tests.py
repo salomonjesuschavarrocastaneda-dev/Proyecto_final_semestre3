@@ -206,6 +206,116 @@ class InventoryApiTests(TestCase):
         self.assertEqual(initial_movement.stock_anterior, 0)
         self.assertEqual(initial_movement.stock_nuevo, 4)
         self.assertEqual(initial_movement.usuario, self.admin)
+        persisted = self.client.get("/api/productos/").data["results"]
+        self.assertTrue(any(item["id"] == product.id for item in persisted))
+
+    def test_admin_rejects_invalid_product_price_and_stock(self):
+        self.authenticate(self.admin)
+        invalid_products = [
+            {
+                "codigo": "NEGATIVE-PRICE",
+                "nombre": "Precio inválido",
+                "categoria": self.category.id,
+                "precio": "-1.00",
+            },
+            {
+                "codigo": "NEGATIVE-STOCK",
+                "nombre": "Stock inválido",
+                "categoria": self.category.id,
+                "precio": "1.00",
+                "stock": -1,
+            },
+            {
+                "codigo": "TEXT-PRICE",
+                "nombre": "Precio no numérico",
+                "categoria": self.category.id,
+                "precio": "abc",
+            },
+        ]
+
+        for data in invalid_products:
+            with self.subTest(codigo=data["codigo"]):
+                response = self.client.post(
+                    "/api/productos/",
+                    data,
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 400, response.data)
+                self.assertFalse(Producto.objects.filter(codigo=data["codigo"]).exists())
+
+    def test_admin_rejects_empty_required_product_fields(self):
+        self.authenticate(self.admin)
+        invalid_products = [
+            {
+                "codigo": "EMPTY-NAME",
+                "nombre": "",
+                "categoria": self.category.id,
+                "precio": "1.00",
+            },
+            {
+                "codigo": "",
+                "nombre": "Sin código",
+                "categoria": self.category.id,
+                "precio": "1.00",
+            },
+            {
+                "codigo": "NO-CATEGORY",
+                "nombre": "Sin categoría",
+                "precio": "1.00",
+            },
+        ]
+
+        for data in invalid_products:
+            with self.subTest(codigo=data.get("codigo")):
+                response = self.client.post(
+                    "/api/productos/",
+                    data,
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 400, response.data)
+        self.assertFalse(
+            Producto.objects.filter(codigo__in=["EMPTY-NAME", "NO-CATEGORY"]).exists()
+        )
+
+    def test_admin_rejects_duplicate_product_code(self):
+        self.authenticate(self.admin)
+        response = self.client.post(
+            "/api/productos/",
+            {
+                "codigo": self.product.codigo,
+                "nombre": "Código repetido",
+                "categoria": self.category.id,
+                "precio": "100.00",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertEqual(Producto.objects.filter(codigo=self.product.codigo).count(), 1)
+
+    def test_invalid_movement_quantity_and_date_return_controlled_errors(self):
+        self.authenticate()
+        invalid_movements = [
+            {"cantidad": 0, "fecha": date.today().isoformat()},
+            {"cantidad": -1, "fecha": date.today().isoformat()},
+            {"cantidad": "abc", "fecha": date.today().isoformat()},
+            {"cantidad": 1, "fecha": "not-a-date"},
+        ]
+
+        for data in invalid_movements:
+            with self.subTest(data=data):
+                response = self.client.post(
+                    "/api/movimientos/registrar/",
+                    {
+                        "producto": self.product.id,
+                        "tipo": "entrada",
+                        **data,
+                    },
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 400, response.data)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock, 10)
+        self.assertFalse(Movimiento.objects.filter(producto=self.product).exists())
 
     def test_admin_can_edit_product_without_changing_stock(self):
         self.authenticate(self.admin)

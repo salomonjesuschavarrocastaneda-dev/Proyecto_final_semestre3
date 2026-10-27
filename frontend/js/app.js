@@ -69,7 +69,9 @@ async function apiRequest(path,options={}){
     const data=response.status===204?null:await response.json().catch(()=>null);
     if(!response.ok){
         if(response.status===401){localStorage.removeItem(SESSION_KEY);location.replace('login.html');}
-        const message=data?.detail||data?.error||(data&&Object.values(data).flat().join(' '))||`La solicitud falló (HTTP ${response.status}).`;
+        if(response.status>=500)throw new Error(`Django devolvió un error interno (HTTP ${response.status}). Revisa la terminal del backend para conocer la causa y comprueba el listado antes de volver a enviar el producto.`);
+        const flattenErrors=value=>Array.isArray(value)?value.flatMap(flattenErrors):value&&typeof value==='object'?Object.values(value).flatMap(flattenErrors):value==null?[]:[String(value)];
+        const message=data?.detail||data?.error||flattenErrors(data).join(' ')||`La solicitud falló (HTTP ${response.status}).`;
         throw new Error(message);
     }
     return data;

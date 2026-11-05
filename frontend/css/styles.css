@@ -318,3 +318,9 @@ body{background:#f4f6fb}
   .sidebar-close{display:grid}
   .brand-lockup{padding-right:40px;padding-left:40px}
 }
+
+/* ===== Menú lateral v3: sin hueco vacío =====
+   Las opciones, la tarjeta del usuario, Ayuda y Cerrar sesión van seguidas.
+   Si no caben, solo las opciones hacen scroll y la parte de abajo sigue visible. */
+.nav{flex:0 1 auto}
+.sidebar-bottom{margin-top:10px}

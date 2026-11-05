@@ -110,3 +110,211 @@ html, body { width: 100%; min-height: 100%; }
   .sale-cart-line button { grid-column: 1 / -1; justify-self: start; }
 }
 .metric-value-inventory { font-size: clamp(17px, 1.65vw, 23px); letter-spacing: -.045em; overflow-wrap: anywhere; }
+/* ===== Mejoras del profesor: menú lateral, menú de usuario y responsive ===== */
+.sidebar{height:100vh;height:100dvh;overflow:hidden;padding:16px 14px 12px}
+.brand-lockup{justify-content:center;min-height:0;padding:4px 4px 14px;flex:none}
+.sidebar-logo{width:100%;max-width:220px;max-height:92px;flex:none;object-fit:contain;object-position:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 10px;box-shadow:0 4px 14px rgba(24,62,145,.08)}
+.workspace-label{margin:14px 10px 6px;flex:none}
+.nav{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:start;gap:3px;padding-right:2px;scrollbar-width:thin;scrollbar-color:#cfd8e8 transparent}
+.nav::-webkit-scrollbar{width:5px}.nav::-webkit-scrollbar-thumb{background:#cfd8e8;border-radius:5px}
+.nav-item{padding:10px 12px}
+.sidebar-bottom{flex:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);display:grid;gap:2px}
+.sidebar-bottom .nav-item{padding:9px 12px}
+.nav-item[hidden]{display:none!important}
+
+/* Menú hamburguesa visible siempre; en computador contrae el menú */
+.menu-button{display:inline-grid!important;place-items:center;flex:none;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:18px;color:var(--navy);cursor:pointer}
+.menu-button:hover{background:var(--blue-soft)}
+@media (min-width:901px){
+  .app-shell{transition:grid-template-columns .2s ease}
+  .app-shell.sidebar-collapsed{grid-template-columns:76px minmax(0,1fr)!important}
+  .app-shell.sidebar-collapsed .sidebar{padding:16px 10px 12px}
+  .app-shell.sidebar-collapsed .sidebar-logo{max-height:44px;padding:4px}
+  .app-shell.sidebar-collapsed .workspace-label,.app-shell.sidebar-collapsed .nav-item em{display:none}
+  .app-shell.sidebar-collapsed .nav-item{font-size:0;justify-content:center;padding:11px 0;gap:0}
+  .app-shell.sidebar-collapsed .nav-item>span:first-child{font-size:19px}
+}
+
+/* Menú del usuario */
+.topbar-user>.user-info{display:grid;line-height:1.25;gap:4px;min-width:0}
+.topbar-user>.user-caret{display:inline}
+.user-menu{position:relative}
+.topbar-user{border:0;border-left:1px solid var(--line);background:transparent;cursor:pointer;text-align:left;font:inherit;color:inherit;border-radius:0;padding:4px 8px 4px 17px}
+.topbar-user:hover strong{color:var(--navy)}
+.user-caret{font-size:11px;color:var(--muted);margin-left:2px;transition:transform .15s}
+.user-menu.open .user-caret{transform:rotate(180deg)}
+.user-dropdown{position:absolute;right:0;top:calc(100% + 10px);width:260px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px rgba(19,36,67,.16);padding:8px;z-index:40;animation:dropIn .14s ease}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.user-dropdown-head{display:flex;gap:11px;align-items:center;padding:10px 10px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.user-dropdown-head>div:last-child{display:grid;gap:3px;min-width:0}
+.user-dropdown-head strong{font-size:13px}
+.user-dropdown-head small{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar-lg{width:42px;height:42px;font-size:14px}
+.role-chip{justify-self:start;font-size:10px;font-weight:700;border-radius:20px;padding:2px 9px;background:#eef1f5;color:#4a5568}
+.role-chip.admin{background:var(--blue-soft);color:var(--navy)}
+.user-dropdown-item{width:100%;display:flex;align-items:center;gap:11px;border:0;background:transparent;padding:10px;border-radius:9px;font:inherit;font-size:13px;color:#3d4759;cursor:pointer;text-align:left}
+.user-dropdown-item span{width:18px;text-align:center}
+.user-dropdown-item:hover{background:#f3f6fc;color:var(--navy)}
+.user-dropdown-item.danger{color:#b43b47;border-top:1px solid var(--line);border-radius:0 0 9px 9px;margin-top:4px}
+.user-dropdown-item.danger:hover{background:var(--red-soft)}
+
+@media (max-width:900px){
+  .sidebar{width:min(280px,85vw)}
+  .sidebar-logo{max-width:180px}
+}
+@media (max-width:650px){
+  .topbar-user{padding-left:6px;border-left:0}
+  .topbar-user>.user-caret,.topbar-user>.user-info{display:none}
+  .user-dropdown{width:min(260px,calc(100vw - 24px))}
+}
+@media (max-height:700px){
+  .sidebar-logo{max-height:74px;padding:4px 8px}
+  .workspace-label{margin-top:10px}
+  .nav-item,.sidebar-bottom .nav-item{padding:8px 12px}
+}
+
+/* ===== Menú lateral: diseño mejorado ===== */
+.sidebar{background:linear-gradient(180deg,#ffffff 0%,#f7f9fd 100%)}
+.brand-lockup{border-bottom:0;padding:2px 0 10px}
+.sidebar-logo{max-width:210px;max-height:88px;border:0;box-shadow:none;background:transparent;padding:0;border-radius:10px;mix-blend-mode:multiply}
+.workspace-label{font-size:10px;letter-spacing:.14em;color:#a0aabb;margin:12px 12px 8px;font-weight:700}
+.nav{gap:4px}
+.nav-item{gap:12px;padding:7px 10px;border-radius:12px;font-size:14.5px;color:#4f5b70;position:relative}
+.nav-item>span:first-child{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:10px;background:#eef2f9;color:#5b6a85;font-size:16px;transition:background .15s,color .15s}
+.nav-item:hover{background:#eef3fd;color:var(--navy)}
+.nav-item:hover>span:first-child{background:#dfe8fb;color:var(--navy)}
+.nav-item.active{background:linear-gradient(135deg,#183e91,#2a62d6);color:#fff;font-weight:700;box-shadow:0 6px 16px rgba(24,62,145,.25)}
+.nav-item.active>span:first-child{background:rgba(255,255,255,.18);color:#fff}
+.nav-item em{background:#e3eafa;color:var(--navy);font-weight:700;border-radius:20px;padding:2px 9px}
+.nav-item.active em{background:rgba(255,255,255,.22);color:#fff}
+.sidebar-bottom{border-top:1px solid var(--line);padding-top:4px}
+.sidebar-bottom .workspace-label{margin-top:10px}
+.sidebar-bottom .nav-item{padding:6px 10px}
+.logout-link{color:#c0394a}
+.logout-link>span:first-child{background:#fdecee!important;color:#c0394a!important}
+.logout-link:hover{background:#fdecee!important;color:#a52d3c!important}
+@media (min-width:901px){
+  .app-shell.sidebar-collapsed .nav-item>span:first-child{font-size:16px}
+  .app-shell.sidebar-collapsed .nav-item{padding:6px 0}
+  .app-shell.sidebar-collapsed .workspace-label{display:none}
+}
+@media (max-height:700px){
+  .sidebar-logo{max-height:66px}
+  .nav-item,.sidebar-bottom .nav-item{padding:5px 10px}
+  .nav-item>span:first-child{width:30px;height:30px}
+  .workspace-label{margin:8px 12px 5px}
+}
+
+/* ===== Pulido visual general ===== */
+:root{--radius:16px;--shadow:0 1px 2px rgba(16,30,60,.04),0 6px 18px rgba(16,30,60,.05)}
+body{background:#f4f6fb}
+.sidebar{background:#fff;box-shadow:1px 0 0 var(--line)}
+.brand-lockup{padding:6px 6px 14px}
+.sidebar-logo{mix-blend-mode:normal;max-width:190px;max-height:96px}
+.nav-item{font-size:14px}
+.workspace-label{color:#aab3c2}
+.topbar{background:rgba(255,255,255,.9)}
+.breadcrumbs span{color:#9aa5b6}
+.page-heading{align-items:center}
+.heading-actions{flex-direction:row;align-items:center;gap:12px}
+.date-chip{padding:9px 14px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.date-chip:before{content:'📅';font-size:12px}
+.btn{border-radius:11px}
+.btn-primary{background:linear-gradient(135deg,#183e91,#2a62d6);box-shadow:0 6px 16px rgba(24,62,145,.22)}
+.btn-primary:hover{background:linear-gradient(135deg,#132f75,#2457c4);transform:translateY(-1px)}
+.metric-card{position:relative;overflow:hidden;padding:18px 18px 16px;transition:transform .15s,box-shadow .15s}
+.metric-card:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(16,30,60,.09)}
+.metric-card:before{content:'';position:absolute;left:0;top:0;right:0;height:4px;background:#2861d7}
+.metric-grid .metric-card:nth-child(2):before{background:var(--green)}
+.metric-grid .metric-card:nth-child(3):before{background:#e5a23a}
+.metric-grid .metric-card:nth-child(4):before{background:var(--red)}
+.metric-grid .metric-card:nth-child(5):before{background:#7c5cd6}
+.metric-top{font-size:12px;font-weight:600;color:#5f6b80}
+.metric-value{font-size:32px;margin:12px 0 4px}
+.metric-foot{font-size:11px}
+.card-heading h2{font-size:16px}
+.card-heading p{font-size:12px}
+.quick-action{border-radius:12px;transition:background .15s}
+.quick-action:hover{background:#f5f8fe}
+@media (max-width:900px){.heading-actions{flex-wrap:wrap}}
+@media (max-width:620px){.page-heading{flex-direction:column;align-items:flex-start}.heading-actions{width:100%;justify-content:space-between}}
+
+@media (max-width:620px){
+  .metric-grid .metric-card:last-child:nth-child(odd){grid-column:1/-1}
+  .metric-value{font-size:26px;white-space:nowrap}
+  .heading-actions{flex-direction:row!important;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:10px}
+}
+
+/* ===== Menú lateral v2: íconos SVG de línea, opción activa sobria y tarjeta del usuario ===== */
+.sidebar{background:#fff;box-shadow:none;border-right:1px solid var(--line);padding:14px 12px 12px;display:flex;flex-direction:column;overflow:hidden}
+.brand-lockup{position:relative;flex:none;display:flex;justify-content:center;align-items:center;padding:4px 4px 12px;border-bottom:1px solid var(--line)}
+.sidebar-logo{display:block;margin:0 auto;width:auto;max-width:170px;max-height:72px;object-fit:contain;object-position:center;border:0;background:transparent;box-shadow:none;padding:0;border-radius:0;mix-blend-mode:normal}
+.sidebar-close{display:none;position:absolute;right:0;top:0;width:36px;height:36px;border:0;border-radius:10px;background:transparent;color:#5b667a;cursor:pointer;place-items:center}
+.sidebar-close:hover{background:#f3f5f9;color:var(--navy)}
+.workspace-label{flex:none;margin:14px 12px 6px;font-size:10px;font-weight:700;letter-spacing:.14em;color:#a0aabb}
+.nav{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:0 2px 4px 0;scrollbar-width:thin;scrollbar-color:#d5dce8 transparent}
+.nav::-webkit-scrollbar{width:5px}.nav::-webkit-scrollbar-thumb{background:#d5dce8;border-radius:5px}
+
+/* Opción del menú */
+.sidebar .nav-item{position:relative;flex:none;min-height:44px;height:44px;display:flex;align-items:center;gap:12px;padding:0 12px 0 14px;border:0;border-radius:10px;background:transparent;box-shadow:none;color:#4f5b70;font-size:14px;font-weight:500;line-height:1;text-align:left;cursor:pointer;transition:background-color .18s ease,color .18s ease}
+.sidebar .nav-icon{flex:none;width:20px;height:20px;color:#7a8599;transition:color .18s ease}
+.sidebar .nav-label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar .nav-item:hover{background:#f3f5f9;color:#1f2a3d}
+.sidebar .nav-item:hover .nav-icon{color:#3f4b60}
+.sidebar .nav-item:focus-visible{outline:2px solid #8db4ff;outline-offset:1px}
+.sidebar .nav-item.active{background:#eaf1ff;color:#183e91;font-weight:700;box-shadow:none}
+.sidebar .nav-item.active .nav-icon{color:#183e91}
+.sidebar .nav-item.active::before{content:'';position:absolute;left:0;top:9px;bottom:9px;width:4px;border-radius:0 4px 4px 0;background:#183e91}
+.sidebar .nav-item em{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;line-height:1;border-radius:20px;padding:3px 8px;background:#eef1f6;color:#5b667a}
+.sidebar .nav-item.active em{background:#fff;color:#183e91}
+
+/* Parte de abajo: tarjeta del usuario, Ayuda y Cerrar sesión */
+.sidebar-bottom{flex:none;margin-top:8px;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:10px;margin-bottom:4px;border:1px solid var(--line);border-radius:12px;background:#f8fafd}
+.sidebar-user .avatar{width:36px;height:36px;font-size:12px;background:#183e91;color:#fff}
+.sidebar-user-info{display:grid;gap:4px;min-width:0}
+.sidebar-user-info strong{font-size:13px;color:#1f2a3d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user .role-chip,.user-dropdown .role-chip{justify-self:start;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:20px;padding:3px 9px;background:#e6f7ef;color:#16845b}
+.sidebar-user .role-chip.admin,.user-dropdown .role-chip.admin{background:#eaf1ff;color:#183e91}
+.sidebar .logout-link{color:#b43b47}
+.sidebar .logout-link .nav-icon{color:#c0394a}
+.sidebar .logout-link:hover{background:#fdecee;color:#a52d3c}
+.sidebar .logout-link:hover .nav-icon{color:#a52d3c}
+
+/* Pantallas bajas: compactar sin esconder nada */
+@media (max-height:720px){
+  .sidebar{padding-top:10px}
+  .sidebar-logo{max-height:56px}
+  .brand-lockup{padding-bottom:8px}
+  .workspace-label{margin:10px 12px 4px}
+  .sidebar .nav-item{height:40px;min-height:40px}
+  .sidebar-user{padding:7px 10px}
+  .sidebar-user .avatar{width:32px;height:32px}
+}
+@media (max-height:620px){
+  .workspace-label{display:none}
+  .sidebar-logo{max-height:46px}
+  .sidebar .nav-item{height:38px;min-height:38px}
+  .sidebar-user{display:none}
+}
+
+/* Computador con el menú contraído: solo íconos */
+@media (min-width:901px){
+  .app-shell.sidebar-collapsed .sidebar{padding:12px 10px}
+  .app-shell.sidebar-collapsed .sidebar-logo{max-height:40px;max-width:52px}
+  .app-shell.sidebar-collapsed .workspace-label,
+  .app-shell.sidebar-collapsed .nav-label,
+  .app-shell.sidebar-collapsed .sidebar .nav-item em,
+  .app-shell.sidebar-collapsed .sidebar-user-info{display:none}
+  .app-shell.sidebar-collapsed .sidebar .nav-item{justify-content:center;padding:0;gap:0;font-size:14px}
+  .app-shell.sidebar-collapsed .sidebar-user{justify-content:center;padding:6px;border:0;background:transparent}
+}
+
+/* Celular y tablet: panel deslizable con X */
+@media (max-width:900px){
+  .sidebar{position:fixed;top:0;bottom:0;left:0;height:100vh;height:100dvh;width:min(280px,85vw);z-index:40;transform:translateX(-105%);transition:transform .22s ease;box-shadow:0 0 40px rgba(19,36,67,.18)}
+  .app-shell.menu-open .sidebar{transform:translateX(0)}
+  .sidebar-scrim{z-index:35}
+  .sidebar-close{display:grid}
+  .brand-lockup{padding-right:40px;padding-left:40px}
+}

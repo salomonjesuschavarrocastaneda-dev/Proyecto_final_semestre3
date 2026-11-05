@@ -173,38 +173,6 @@ html, body { width: 100%; min-height: 100%; }
   .nav-item,.sidebar-bottom .nav-item{padding:8px 12px}
 }
 
-/* ===== Menú lateral: diseño mejorado ===== */
-.sidebar{background:linear-gradient(180deg,#ffffff 0%,#f7f9fd 100%)}
-.brand-lockup{border-bottom:0;padding:2px 0 10px}
-.sidebar-logo{max-width:210px;max-height:88px;border:0;box-shadow:none;background:transparent;padding:0;border-radius:10px;mix-blend-mode:multiply}
-.workspace-label{font-size:10px;letter-spacing:.14em;color:#a0aabb;margin:12px 12px 8px;font-weight:700}
-.nav{gap:4px}
-.nav-item{gap:12px;padding:7px 10px;border-radius:12px;font-size:14.5px;color:#4f5b70;position:relative}
-.nav-item>span:first-child{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:10px;background:#eef2f9;color:#5b6a85;font-size:16px;transition:background .15s,color .15s}
-.nav-item:hover{background:#eef3fd;color:var(--navy)}
-.nav-item:hover>span:first-child{background:#dfe8fb;color:var(--navy)}
-.nav-item.active{background:linear-gradient(135deg,#183e91,#2a62d6);color:#fff;font-weight:700;box-shadow:0 6px 16px rgba(24,62,145,.25)}
-.nav-item.active>span:first-child{background:rgba(255,255,255,.18);color:#fff}
-.nav-item em{background:#e3eafa;color:var(--navy);font-weight:700;border-radius:20px;padding:2px 9px}
-.nav-item.active em{background:rgba(255,255,255,.22);color:#fff}
-.sidebar-bottom{border-top:1px solid var(--line);padding-top:4px}
-.sidebar-bottom .workspace-label{margin-top:10px}
-.sidebar-bottom .nav-item{padding:6px 10px}
-.logout-link{color:#c0394a}
-.logout-link>span:first-child{background:#fdecee!important;color:#c0394a!important}
-.logout-link:hover{background:#fdecee!important;color:#a52d3c!important}
-@media (min-width:901px){
-  .app-shell.sidebar-collapsed .nav-item>span:first-child{font-size:16px}
-  .app-shell.sidebar-collapsed .nav-item{padding:6px 0}
-  .app-shell.sidebar-collapsed .workspace-label{display:none}
-}
-@media (max-height:700px){
-  .sidebar-logo{max-height:66px}
-  .nav-item,.sidebar-bottom .nav-item{padding:5px 10px}
-  .nav-item>span:first-child{width:30px;height:30px}
-  .workspace-label{margin:8px 12px 5px}
-}
-
 /* ===== Pulido visual general ===== */
 :root{--radius:16px;--shadow:0 1px 2px rgba(16,30,60,.04),0 6px 18px rgba(16,30,60,.05)}
 body{background:#f4f6fb}
@@ -245,82 +213,143 @@ body{background:#f4f6fb}
   .heading-actions{flex-direction:row!important;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:10px}
 }
 
-/* ===== Menú lateral v2: íconos SVG de línea, opción activa sobria y tarjeta del usuario ===== */
-.sidebar{background:#fff;box-shadow:none;border-right:1px solid var(--line);padding:14px 12px 12px;display:flex;flex-direction:column;overflow:hidden}
-.brand-lockup{position:relative;flex:none;display:flex;justify-content:center;align-items:center;padding:4px 4px 12px;border-bottom:1px solid var(--line)}
-.sidebar-logo{display:block;margin:0 auto;width:auto;max-width:170px;max-height:72px;object-fit:contain;object-position:center;border:0;background:transparent;box-shadow:none;padding:0;border-radius:0;mix-blend-mode:normal}
-.sidebar-close{display:none;position:absolute;right:0;top:0;width:36px;height:36px;border:0;border-radius:10px;background:transparent;color:#5b667a;cursor:pointer;place-items:center}
-.sidebar-close:hover{background:#f3f5f9;color:var(--navy)}
-.workspace-label{flex:none;margin:14px 12px 6px;font-size:10px;font-weight:700;letter-spacing:.14em;color:#a0aabb}
-.nav{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:0 2px 4px 0;scrollbar-width:thin;scrollbar-color:#d5dce8 transparent}
-.nav::-webkit-scrollbar{width:5px}.nav::-webkit-scrollbar-thumb{background:#d5dce8;border-radius:5px}
+
+/* ===================================================================
+   Menú lateral v4: bloque único del sidebar (reemplaza v1, v2 y v3)
+   Jerarquía: logo (alineado con la barra superior) > etiqueta de sección
+   > opciones > tarjeta de cuenta (usuario, Ayuda y Cerrar sesión).
+   =================================================================== */
+.app-shell{--sb-w:264px}
+@media (min-width:901px){
+  .app-shell{grid-template-columns:var(--sb-w) minmax(0,1fr)}
+  .app-shell.sidebar-collapsed{--sb-w:76px}
+}
+@media (min-width:901px) and (max-width:1150px){
+  .app-shell:not(.sidebar-collapsed){--sb-w:236px}
+}
+
+.sidebar{position:sticky;top:0;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding:0 12px 12px;background:#fff;border-right:1px solid var(--line);box-shadow:none}
+
+/* Logo: misma altura que la barra superior para que las líneas coincidan */
+.brand-lockup{position:relative;flex:none;height:72px;min-height:72px;margin:0 -12px;padding:0 16px;display:flex;align-items:center;justify-content:center;gap:0;border-bottom:1px solid var(--line)}
+.sidebar-logo{display:block;width:auto;height:auto;max-width:150px;max-height:54px;margin:0 auto;object-fit:contain;object-position:center;border:0;border-radius:0;padding:0;background:none;box-shadow:none;mix-blend-mode:normal}
+
+/* Etiqueta de sección */
+.workspace-label{flex:none;margin:20px 12px 8px;font-size:10.5px;font-weight:700;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:#98a2b3}
+
+/* Lista de opciones: hace scroll solo si no cabe */
+.nav{flex:0 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:2px;margin:0 -4px;padding:0 4px 2px;scrollbar-width:thin;scrollbar-color:#d5dce8 transparent}
+.nav::-webkit-scrollbar{width:5px}
+.nav::-webkit-scrollbar-thumb{background:#d5dce8;border-radius:5px}
 
 /* Opción del menú */
-.sidebar .nav-item{position:relative;flex:none;min-height:44px;height:44px;display:flex;align-items:center;gap:12px;padding:0 12px 0 14px;border:0;border-radius:10px;background:transparent;box-shadow:none;color:#4f5b70;font-size:14px;font-weight:500;line-height:1;text-align:left;cursor:pointer;transition:background-color .18s ease,color .18s ease}
-.sidebar .nav-icon{flex:none;width:20px;height:20px;color:#7a8599;transition:color .18s ease}
+.sidebar .nav-item{position:relative;flex:none;width:100%;height:42px;min-height:42px;display:flex;align-items:center;gap:12px;padding:0 12px;border:0;border-radius:10px;background:transparent;box-shadow:none;color:#4b5670;font:inherit;font-size:14px;font-weight:500;line-height:1;text-align:left;cursor:pointer;transition:background-color .16s ease,color .16s ease}
+.sidebar .nav-icon{flex:none;width:19px;height:19px;color:#8a94a8;transition:color .16s ease}
 .sidebar .nav-label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sidebar .nav-item:hover{background:#f3f5f9;color:#1f2a3d}
-.sidebar .nav-item:hover .nav-icon{color:#3f4b60}
-.sidebar .nav-item:focus-visible{outline:2px solid #8db4ff;outline-offset:1px}
-.sidebar .nav-item.active{background:#eaf1ff;color:#183e91;font-weight:700;box-shadow:none}
+.sidebar .nav-item:hover{background:#f3f6fb;color:#1d2840}
+.sidebar .nav-item:hover .nav-icon{color:#4b5670}
+.sidebar .nav-item:focus-visible{outline:none;box-shadow:0 0 0 2px #fff,0 0 0 4px #9dbcf5}
+.sidebar .nav-item.active{background:#eaf1ff;color:#183e91;font-weight:600}
 .sidebar .nav-item.active .nav-icon{color:#183e91}
-.sidebar .nav-item.active::before{content:'';position:absolute;left:0;top:9px;bottom:9px;width:4px;border-radius:0 4px 4px 0;background:#183e91}
-.sidebar .nav-item em{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;line-height:1;border-radius:20px;padding:3px 8px;background:#eef1f6;color:#5b667a}
-.sidebar .nav-item.active em{background:#fff;color:#183e91}
+.sidebar .nav-item.active::before{content:"";position:absolute;left:0;top:11px;bottom:11px;width:3px;border-radius:0 3px 3px 0;background:#183e91}
+.sidebar .nav-item em{margin-left:auto;min-width:22px;height:20px;padding:0 7px;display:inline-grid;place-items:center;border-radius:10px;background:#eef1f6;color:#5b667a;font-style:normal;font-size:11px;font-weight:600;line-height:1}
+.sidebar .nav-item.active em{background:#fff;color:#183e91;box-shadow:inset 0 0 0 1px #d4e2ff}
 
-/* Parte de abajo: tarjeta del usuario, Ayuda y Cerrar sesión */
-.sidebar-bottom{flex:none;margin-top:8px;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
-.sidebar-user{display:flex;align-items:center;gap:10px;padding:10px;margin-bottom:4px;border:1px solid var(--line);border-radius:12px;background:#f8fafd}
-.sidebar-user .avatar{width:36px;height:36px;font-size:12px;background:#183e91;color:#fff}
+/* Tarjeta de cuenta: usuario + Ayuda + Cerrar sesión */
+.sidebar-bottom{flex:none;margin-top:16px;padding:6px;display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:14px;background:#f8fafc}
+.sidebar-user{display:flex;align-items:center;gap:10px;margin:0 0 4px;padding:8px 8px 10px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+.sidebar-user .avatar{width:36px;height:36px;flex:none;border-radius:50%;background:#183e91;color:#fff;font-size:12px;font-weight:700;letter-spacing:.02em;box-shadow:0 0 0 3px #e3ebfb}
 .sidebar-user-info{display:grid;gap:4px;min-width:0}
-.sidebar-user-info strong{font-size:13px;color:#1f2a3d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sidebar-user .role-chip,.user-dropdown .role-chip{justify-self:start;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:20px;padding:3px 9px;background:#e6f7ef;color:#16845b}
+.sidebar-user-info strong{font-size:13px;font-weight:600;line-height:1.2;color:#1d2840;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user .role-chip,.user-dropdown .role-chip{justify-self:start;padding:3px 8px;border-radius:20px;font-size:10.5px;font-weight:600;line-height:1.2;letter-spacing:.01em;background:#e6f7ef;color:#16845b}
 .sidebar-user .role-chip.admin,.user-dropdown .role-chip.admin{background:#eaf1ff;color:#183e91}
-.sidebar .logout-link{color:#b43b47}
-.sidebar .logout-link .nav-icon{color:#c0394a}
-.sidebar .logout-link:hover{background:#fdecee;color:#a52d3c}
-.sidebar .logout-link:hover .nav-icon{color:#a52d3c}
+.sidebar-bottom .nav-item{height:38px;min-height:38px;padding:0 10px;border-radius:9px;font-size:13.5px}
+.sidebar-bottom .nav-item:hover{background:#eef2f8}
+.sidebar .logout-link,.sidebar .logout-link .nav-icon{color:#b43b47}
+.sidebar .logout-link:hover{background:#fdecee;color:#9f2a38}
+.sidebar .logout-link:hover .nav-icon{color:#9f2a38}
 
-/* Pantallas bajas: compactar sin esconder nada */
+/* Botón de cerrar (solo en el panel del celular) */
+.sidebar-close{display:none;position:absolute;top:50%;right:12px;transform:translateY(-50%);width:36px;height:36px;place-items:center;border:0;border-radius:10px;background:transparent;color:#5b667a;cursor:pointer;transition:background-color .16s ease,color .16s ease}
+.sidebar-close:hover{background:#f3f6fb;color:#183e91}
+.sidebar-close .nav-icon{width:20px;height:20px;color:currentColor}
+
+/* Botón del menú en la barra superior */
+.menu-button{color:#4b5670;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+.menu-button:hover{background:#f3f6fb;color:#183e91;border-color:#d4e2ff}
+.menu-button svg{width:20px;height:20px}
+
+/* Pantallas bajas: compactar sin esconder Cerrar sesión */
 @media (max-height:720px){
-  .sidebar{padding-top:10px}
-  .sidebar-logo{max-height:56px}
-  .brand-lockup{padding-bottom:8px}
-  .workspace-label{margin:10px 12px 4px}
+  .workspace-label{margin:14px 12px 6px}
   .sidebar .nav-item{height:40px;min-height:40px}
-  .sidebar-user{padding:7px 10px}
+  .sidebar-bottom{margin-top:12px}
+  .sidebar-user{padding:6px 8px 8px}
   .sidebar-user .avatar{width:32px;height:32px}
+  .sidebar-bottom .nav-item{height:36px;min-height:36px}
 }
-@media (max-height:620px){
+@media (max-height:600px){
   .workspace-label{display:none}
-  .sidebar-logo{max-height:46px}
+  .nav{margin-top:10px}
   .sidebar .nav-item{height:38px;min-height:38px}
   .sidebar-user{display:none}
 }
 
-/* Computador con el menú contraído: solo íconos */
+/* Computador con el menú contraído: solo íconos (nombre al pasar el mouse) */
 @media (min-width:901px){
-  .app-shell.sidebar-collapsed .sidebar{padding:12px 10px}
-  .app-shell.sidebar-collapsed .sidebar-logo{max-height:40px;max-width:52px}
-  .app-shell.sidebar-collapsed .workspace-label,
+  .app-shell.sidebar-collapsed .sidebar{padding:0 10px 12px}
+  .app-shell.sidebar-collapsed .brand-lockup{margin:0 -10px;padding:0}
+  .app-shell.sidebar-collapsed .sidebar-logo{display:none}
+  .app-shell.sidebar-collapsed .brand-lockup::before{content:"";width:36px;height:36px;background:url(../assets/magnussig-logo.png?v=2) no-repeat -32px 0/112px 56px}
+  .app-shell.sidebar-collapsed .workspace-label{display:block;height:1px;margin:16px 8px 10px;font-size:0;background:var(--line)}
   .app-shell.sidebar-collapsed .nav-label,
-  .app-shell.sidebar-collapsed .sidebar .nav-item em,
   .app-shell.sidebar-collapsed .sidebar-user-info{display:none}
-  .app-shell.sidebar-collapsed .sidebar .nav-item{justify-content:center;padding:0;gap:0;font-size:14px}
-  .app-shell.sidebar-collapsed .sidebar-user{justify-content:center;padding:6px;border:0;background:transparent}
+  .app-shell.sidebar-collapsed .sidebar .nav-item{justify-content:center;gap:0;padding:0;font-size:14px}
+  .app-shell.sidebar-collapsed .sidebar .nav-item em{position:absolute;top:4px;right:4px;min-width:16px;height:16px;padding:0 4px;font-size:9.5px}
+  .app-shell.sidebar-collapsed .sidebar-bottom{padding:4px;border-radius:12px}
+  .app-shell.sidebar-collapsed .sidebar-user{justify-content:center;padding:6px 0 8px}
 }
 
-/* Celular y tablet: panel deslizable con X */
+/* Celular y tablet: panel deslizable con fondo oscuro, sin empujar el contenido */
 @media (max-width:900px){
-  .sidebar{position:fixed;top:0;bottom:0;left:0;height:100vh;height:100dvh;width:min(280px,85vw);z-index:40;transform:translateX(-105%);transition:transform .22s ease;box-shadow:0 0 40px rgba(19,36,67,.18)}
-  .app-shell.menu-open .sidebar{transform:translateX(0)}
-  .sidebar-scrim{z-index:35}
+  .app-shell{grid-template-columns:minmax(0,1fr)}
+  .sidebar{position:fixed;top:0;bottom:0;left:0;z-index:40;width:min(284px,86vw);height:100vh;height:100dvh;padding:0 12px 16px;overflow-y:auto;transform:translateX(-105%);visibility:hidden;box-shadow:0 0 40px rgba(19,36,67,.18);transition:transform .24s ease,visibility 0s linear .24s}
+  .app-shell.menu-open .sidebar{transform:translateX(0);visibility:visible;transition:transform .24s ease,visibility 0s}
+  .sidebar-scrim{z-index:35;background:rgba(15,27,52,.42);backdrop-filter:blur(1.5px)}
   .sidebar-close{display:grid}
-  .brand-lockup{padding-right:40px;padding-left:40px}
+  .brand-lockup{justify-content:flex-start;padding:0 56px 0 18px}
+  body:has(.app-shell.menu-open){overflow:hidden}
+}
+@media (prefers-reduced-motion:reduce){
+  .sidebar,.sidebar .nav-item,.sidebar .nav-icon{transition:none!important}
 }
 
-/* ===== Menú lateral v3: sin hueco vacío =====
-   Las opciones, la tarjeta del usuario, Ayuda y Cerrar sesión van seguidas.
-   Si no caben, solo las opciones hacen scroll y la parte de abajo sigue visible. */
-.nav{flex:0 1 auto}
-.sidebar-bottom{margin-top:10px}
+/* ===================================================================
+   Menú lateral v5: parte de abajo ordenada
+   Arriba: logo y opciones. Abajo (fijo): Estado del inventario + cuenta.
+   La tarjeta del inventario se oculta sola (ui.js) si no cabe.
+   =================================================================== */
+.sidebar-bottom{margin-top:auto}
+.sidebar-stock{flex:none;margin-top:auto;padding:12px 10px 6px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.sidebar-stock:not([hidden]) + .sidebar-bottom{margin-top:10px}
+.sidebar-stock[hidden]{display:none}
+.sidebar-stock-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 4px}
+.sidebar-stock-head span{font-size:12px;font-weight:600;color:#1d2840}
+.sidebar-stock-head strong{font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap}
+.stock-bar{display:flex;gap:2px;height:6px;margin:10px 4px 6px;border-radius:6px;overflow:hidden;background:#eef1f6}
+.stock-bar i{display:block;height:100%;transition:width .35s ease}
+.stock-bar i:first-child{border-radius:6px 0 0 6px}
+.stock-bar i:last-child{border-radius:0 6px 6px 0}
+.stock-bar .ok,.stock-legend .dot.ok{background:#16845b}
+.stock-bar .low,.stock-legend .dot.low{background:#e5a23a}
+.stock-bar .out,.stock-legend .dot.out{background:#c83743}
+.stock-legend{display:grid;gap:1px}
+.stock-legend button{display:flex;align-items:center;gap:8px;width:100%;height:30px;padding:0 6px;border:0;border-radius:8px;background:transparent;color:#4b5670;font:inherit;font-size:12.5px;text-align:left;cursor:pointer;transition:background-color .16s ease,color .16s ease}
+.stock-legend button:hover{background:#f3f6fb;color:#1d2840}
+.stock-legend button:focus-visible{outline:none;box-shadow:0 0 0 2px #9dbcf5}
+.stock-legend .dot{width:8px;height:8px;flex:none;border-radius:50%}
+.stock-legend b{margin-left:auto;font-size:12.5px;font-weight:600;color:#1d2840;font-variant-numeric:tabular-nums}
+@media (min-width:901px){
+  .app-shell.sidebar-collapsed .sidebar-stock{display:none}
+  .app-shell.sidebar-collapsed .sidebar-bottom{margin-top:auto}
+}

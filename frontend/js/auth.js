@@ -130,12 +130,9 @@ forms.register.addEventListener('submit', async (event) => {
       })
     });
     accountCreated = true;
-    const data = await request('/auth/login/', {
-      method: 'POST',
-      body: JSON.stringify({ email, password })
-    });
-    saveSession(data, email);
-    window.location.href = 'index.html';
+    forms.register.reset();
+    setMode('login');
+    alertMessage('Tu cuenta fue creada y está pendiente de aprobación por el super administrador.', 'success');
   } catch (error) {
     alertMessage(accountCreated
       ? `La cuenta se creó, pero no se pudo iniciar sesión: ${error.message}`

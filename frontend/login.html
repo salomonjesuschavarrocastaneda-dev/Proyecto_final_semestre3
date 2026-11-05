@@ -9,7 +9,6 @@
   <main class="login-layout">
     <section class="login-brand-panel">
       <img src="assets/magnussig-logo.jpeg" alt="MAGNUSSIG SIG — Asesoría e Ingeniería en sistemas integrados de gestión" class="login-brand-logo" onerror="this.style.display='none'">
-      <div class="brand-monogram">MS</div>
       <p class="eyebrow">MAGNUSSIG SAS · NEIVA, HUILA</p>
       <h1>Control, trazabilidad<br>y decisiones inteligentes.</h1>
       <p class="brand-copy">Sistema de gestión de inventario para una operación organizada, segura y eficiente.</p>
@@ -30,7 +29,7 @@
           <div class="field"><label for="registerEmail">Correo electrónico</label><input id="registerEmail" type="email" autocomplete="email" placeholder="nombre@empresa.com" required></div>
           <div class="field"><label for="registerPassword">Contraseña</label><input id="registerPassword" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required minlength="8"></div>
           <div class="field"><label for="registerPasswordConfirm">Confirmar contraseña</label><input id="registerPasswordConfirm" type="password" autocomplete="new-password" placeholder="Repite tu contraseña" required minlength="8"></div>
-          <div class="field"><label for="registerRole">Crear cuenta como</label><select id="registerRole" required><option value="Empleado">Empleado</option><option value="Administrador">Administrador</option></select><p class="form-help">Las cuentas de administrador tienen acceso completo al sistema.</p></div>
+          <div class="field"><label for="registerRole">Crear cuenta como</label><select id="registerRole" required><option value="Super Administrador">Super Administrador</option><option value="Administrador">Administrador</option><option value="Empleado">Empleado</option><option value="Cliente">Cliente</option></select><p class="form-help">Las cuentas nuevas quedan pendientes hasta que un super administrador las apruebe.</p></div>
           <button class="btn btn-primary btn-full" type="submit" id="registerSubmit">Crear cuenta</button>
         </form>
         <form id="forgotForm" hidden>

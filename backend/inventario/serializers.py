@@ -539,7 +539,8 @@ class UserCreateSerializer(serializers.Serializer):
             email=validated_data["email"],
             password=validated_data["password"],
             first_name=nombre,
-            is_staff=validated_data["rol"] == "Administrador",
+            is_staff=validated_data["rol"] in {"Administrador", "Super Administrador"},
+            is_active=False,
         )
         PerfilUsuario.objects.create(usuario=user, rol=validated_data["rol"])
         return user

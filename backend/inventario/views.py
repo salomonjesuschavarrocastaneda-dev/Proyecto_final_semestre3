@@ -49,6 +49,15 @@ def is_inventory_admin(user):
         return user.is_staff
 
 
+def is_super_admin(user):
+    if not user or not user.is_authenticated:
+        return False
+    try:
+        return user.perfil_inventario.rol == "Super Administrador"
+    except PerfilUsuario.DoesNotExist:
+        return False
+
+
 class AdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return request.method in SAFE_METHODS or is_inventory_admin(request.user)
@@ -397,7 +406,7 @@ def users_view(request):
     )
 
 
-@api_view(["DELETE"])
+@api_view(["PATCH", "DELETE"])
 @permission_classes([IsAuthenticated])
 def user_detail_view(request, user_id):
     if not is_inventory_admin(request.user):
@@ -411,6 +420,15 @@ def user_detail_view(request, user_id):
             {"detail": "El usuario no existe."},
             status=status.HTTP_404_NOT_FOUND,
         )
+    if request.method == "PATCH":
+        if not is_super_admin(request.user):
+            return Response(
+                {"detail": "Solo el super administrador puede aprobar cuentas."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        user.is_active = True
+        user.save(update_fields=["is_active"])
+        return Response(user_payload(user))
     if user.pk == request.user.pk:
         return Response(
             {"detail": "No puedes eliminar la cuenta con la que iniciaste sesión."},

@@ -128,8 +128,7 @@ forms.register.addEventListener('submit', async (event) => {
         nombre: $('registerName').value.trim(),
         email,
         password,
-        password_confirm: $('registerPasswordConfirm').value,
-        rol: $('registerRole').value
+        password_confirm: $('registerPasswordConfirm').value
       })
     });
     accountCreated = true;

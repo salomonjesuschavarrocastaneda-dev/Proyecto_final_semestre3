@@ -88,7 +88,12 @@ def health(_request):
 def login_view(request):
     email = str(request.data.get("email", "")).strip().lower()
     password = request.data.get("password", "")
-    user_obj = User.objects.filter(email__iexact=email, is_active=True).first()
+    user_obj = User.objects.filter(email__iexact=email).first()
+    if user_obj and not user_obj.is_active:
+        return Response(
+            {"detail": "Tu cuenta está pendiente de aprobación por el super administrador."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
     user = authenticate(
         request,
         username=user_obj.username if user_obj else email,
@@ -120,7 +125,10 @@ def session_view(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register_view(request):
-    serializer = UserCreateSerializer(data=request.data)
+    serializer = UserCreateSerializer(
+        data=request.data,
+        context={"request": request, "public_registration": True},
+    )
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
     return Response(user_payload(user), status=status.HTTP_201_CREATED)
@@ -387,6 +395,14 @@ def users_view(request):
             status=status.HTTP_403_FORBIDDEN,
         )
     if request.method == "POST":
+        if (
+            request.data.get("rol") == "Super Administrador"
+            and not is_super_admin(request.user)
+        ):
+            return Response(
+                {"detail": "Solo el super administrador puede crear otra cuenta con ese rol."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()

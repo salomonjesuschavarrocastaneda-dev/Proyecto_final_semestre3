@@ -518,6 +518,9 @@ class UserCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {"password_confirm": "Las contraseñas no coinciden."}
             )
+        # El registro público nunca puede asignar privilegios desde el navegador.
+        if self.context.get("public_registration"):
+            attrs["rol"] = "Empleado"
         candidate = User(username=attrs["email"].split("@")[0], email=attrs["email"])
         try:
             password_validation.validate_password(attrs["password"], user=candidate)
@@ -534,13 +537,16 @@ class UserCreateSerializer(serializers.Serializer):
         while User.objects.filter(username=username).exists():
             username = f"{base}{index}"
             index += 1
+        is_public_registration = self.context.get("public_registration", False)
         user = User.objects.create_user(
             username=username,
             email=validated_data["email"],
             password=validated_data["password"],
             first_name=nombre,
             is_staff=validated_data["rol"] in {"Administrador", "Super Administrador"},
-            is_active=False,
+            # El alta pública queda pendiente; el alta realizada por un administrador
+            # queda activa porque ya fue autorizada desde el panel de gestión.
+            is_active=not is_public_registration,
         )
         PerfilUsuario.objects.create(usuario=user, rol=validated_data["rol"])
         return user

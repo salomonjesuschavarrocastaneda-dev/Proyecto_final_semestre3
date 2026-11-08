@@ -142,6 +142,7 @@ class InventoryApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         user = User.objects.get(email="new@example.test")
         self.assertTrue(user.check_password("AnotherUnitTestPassword!246"))
+        self.assertTrue(user.is_active)
         self.assertEqual(user.perfil_inventario.rol, "Empleado")
         token = Token.objects.create(user=user)
 
@@ -167,6 +168,22 @@ class InventoryApiTests(TestCase):
         user = User.objects.get(email="another-admin@example.test")
         self.assertTrue(user.is_staff)
         self.assertEqual(user.perfil_inventario.rol, "Administrador")
+
+    def test_regular_admin_cannot_create_super_administrator(self):
+        self.authenticate(self.admin)
+        response = self.client.post(
+            "/api/usuarios/",
+            {
+                "nombre": "Super administrador no autorizado",
+                "email": "unauthorized.super@example.test",
+                "password": "AnotherUnitTestPassword!246",
+                "password_confirm": "AnotherUnitTestPassword!246",
+                "rol": "Super Administrador",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(User.objects.filter(email="unauthorized.super@example.test").exists())
 
     def test_admin_cannot_delete_own_account(self):
         self.authenticate(self.admin)

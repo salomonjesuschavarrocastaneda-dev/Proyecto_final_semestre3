@@ -395,6 +395,14 @@ def users_view(request):
             status=status.HTTP_403_FORBIDDEN,
         )
     if request.method == "POST":
+        if (
+            request.data.get("rol") == "Super Administrador"
+            and not is_super_admin(request.user)
+        ):
+            return Response(
+                {"detail": "Solo el super administrador puede crear otra cuenta con ese rol."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()

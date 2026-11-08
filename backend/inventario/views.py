@@ -111,6 +111,12 @@ def logout_view(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def session_view(request):
+    return Response({"user": user_payload(request.user)})
+
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register_view(request):

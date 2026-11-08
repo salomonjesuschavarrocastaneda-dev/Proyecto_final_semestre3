@@ -1,6 +1,8 @@
 /* MAGNUSSIG SIG — inventario conectado a la API Django. */
-const API_BASE=localStorage.getItem('inventario.apiBase')||'http://127.0.0.1:3000/api';
+const API_BASE='http://127.0.0.1:8000/api';
 const SESSION_KEY='inventario.session';
+const API_BASE_KEY='inventario.apiBase';
+localStorage.setItem(API_BASE_KEY,API_BASE);
 const $=id=>document.getElementById(id);
 const session=()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY));}catch{return null;}};
 const isAdmin=()=>['Administrador','Super Administrador','Admin'].includes(session()?.user?.rol)||Boolean(session()?.user?.is_staff);
@@ -69,7 +71,7 @@ async function apiRequest(path,options={}){
     catch{throw new Error('No fue posible conectar con Django. Verifica el backend y la dirección de la API.');}
     const data=response.status===204?null:await response.json().catch(()=>null);
     if(!response.ok){
-        if(response.status===401){localStorage.removeItem(SESSION_KEY);location.replace('login.html');}
+        if(response.status===401&&options.verifySession){localStorage.removeItem(SESSION_KEY);location.replace('login.html');}
         if(response.status>=500)throw new Error(`Django devolvió un error interno (HTTP ${response.status}). Revisa la terminal del backend para conocer la causa y comprueba el listado antes de volver a enviar el producto.`);
         const flattenErrors=value=>Array.isArray(value)?value.flatMap(flattenErrors):value&&typeof value==='object'?Object.values(value).flatMap(flattenErrors):value==null?[]:[String(value)];
         const message=data?.detail||data?.error||flattenErrors(data).join(' ')||`La solicitud falló (HTTP ${response.status}).`;
@@ -300,7 +302,20 @@ function attachEvents(){
     });
 }
 async function logout(){try{await apiRequest('/auth/logout/',{method:'POST'});}catch(error){console.error('No se pudo revocar el token en Django:',error);}finally{localStorage.removeItem(SESSION_KEY);location.href='login.html';}}
-async function init(){const s=session();if(!s?.token||s.token==='demo-token'){localStorage.removeItem(SESSION_KEY);location.replace('login.html');return;}useApi=true;localStorage.removeItem(demoKey);$('topUserName').textContent=s.user?.nombre||'Usuario';$('topUserRole').textContent=s.user?.rol||'Empleado';$('userAvatar').textContent=(s.user?.nombre||'U').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();$('usersNav').hidden=!isAdmin();document.querySelectorAll('[data-action="new-product"],[data-action="new-category"],[data-action="new-user"]').forEach(button=>{button.hidden=!isAdmin();});$('metricGrid').innerHTML='<article class="metric-card">Cargando inventario…</article>';$('movementChart').textContent='Cargando movimientos…';$('attentionBody').innerHTML='<tr><td colspan="7" class="empty-row">Cargando productos…</td></tr>';$('productsBody').innerHTML='<tr><td colspan="8" class="empty-row">Cargando productos…</td></tr>';$('categoryGrid').textContent='Cargando categorías…';$('movementsBody').innerHTML='<tr><td colspan="7" class="empty-row">Cargando movimientos…</td></tr>';$('salesBody').innerHTML='<tr><td colspan="7" class="empty-row">Cargando ventas…</td></tr>';$('usersBody').innerHTML='<tr><td colspan="6" class="empty-row">Cargando usuarios…</td></tr>';$('reportBody').innerHTML='<tr><td colspan="3" class="empty-row">Cargando reportes…</td></tr>';await refreshResources();attachEvents();renderAll();changeView(location.hash.replace('#','')||'dashboard');}
+async function init(){
+  const s=session();
+  if(!s?.token||s.token==='demo-token'){localStorage.removeItem(SESSION_KEY);location.replace('login.html');return;}
+  try{
+    const verified=await apiRequest('/auth/session/',{verifySession:true});
+    if(!verified?.user){throw new Error('Django no devolvió los datos de la sesión.');}
+    s.user={...s.user,...verified.user};
+    localStorage.setItem(SESSION_KEY,JSON.stringify(s));
+  }catch(error){
+    if(!['La sesión venció. Inicia sesión nuevamente.'].includes(error.message)){console.error('Error al verificar la sesión:',error);}
+    return;
+  }
+  useApi=true;localStorage.removeItem(demoKey);$('topUserName').textContent=s.user?.nombre||'Usuario';$('topUserRole').textContent=s.user?.rol||'Empleado';$('userAvatar').textContent=(s.user?.nombre||'U').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();$('usersNav').hidden=!isAdmin();document.querySelectorAll('[data-action="new-product"],[data-action="new-category"],[data-action="new-user"]').forEach(button=>{button.hidden=!isAdmin();});$('metricGrid').innerHTML='<article class="metric-card">Cargando inventario…</article>';$('movementChart').textContent='Cargando movimientos…';$('attentionBody').innerHTML='<tr><td colspan="7" class="empty-row">Cargando productos…</td></tr>';$('productsBody').innerHTML='<tr><td colspan="8" class="empty-row">Cargando productos…</td></tr>';$('categoryGrid').textContent='Cargando categorías…';$('movementsBody').innerHTML='<tr><td colspan="7" class="empty-row">Cargando movimientos…</td></tr>';$('salesBody').innerHTML='<tr><td colspan="7" class="empty-row">Cargando ventas…</td></tr>';$('usersBody').innerHTML='<tr><td colspan="6" class="empty-row">Cargando usuarios…</td></tr>';$('reportBody').innerHTML='<tr><td colspan="3" class="empty-row">Cargando reportes…</td></tr>';await refreshResources();attachEvents();renderAll();changeView(location.hash.replace('#','')||'dashboard');
+}
 document.addEventListener('DOMContentLoaded',()=> {
   const menuButton=$('userMenuButton');
   const menu=$('userDropdown')?.closest('.topbar-user-menu');

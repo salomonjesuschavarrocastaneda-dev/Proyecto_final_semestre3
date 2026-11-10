@@ -239,17 +239,17 @@ python manage.py migrate
 Inicie Django explícitamente en el puerto definido para el proyecto:
 
 ```powershell
-python manage.py runserver 127.0.0.1:8000
+python manage.py runserver 127.0.0.1:3000
 ```
 
 Direcciones disponibles:
 
-- Sitio principal de Django: `http://127.0.0.1:8000/`
-- API REST: `http://127.0.0.1:8000/api/`
-- Administración: `http://127.0.0.1:8000/admin/`
-- Comprobación de estado: `http://127.0.0.1:8000/api/health/`
+- Sitio principal de Django: `http://127.0.0.1:3000/`
+- API REST: `http://127.0.0.1:3000/api/`
+- Administración: `http://127.0.0.1:3000/admin/`
+- Comprobación de estado: `http://127.0.0.1:3000/api/health/`
 
-Mantenga la terminal abierta durante el uso de la aplicación. El frontend utiliza el puerto 8000 para comunicarse con Django.
+Mantenga la terminal abierta durante el uso de la aplicación. El frontend utiliza el puerto 3000 para comunicarse con Django.
 
 La variable `PORT` incluida en `.env.example` no reemplaza la ejecución explícita anterior. Para evitar diferencias de configuración, ejecute el comando indicado de forma explícita.
 
@@ -265,10 +265,10 @@ El frontend puede abrirse desde Visual Studio Code con Live Server:
 La URL local suele ser `http://127.0.0.1:5500/frontend/login.html` o una variante equivalente según la carpeta seleccionada en Live Server. Los valores de API implementados en el frontend apuntan a:
 
 ```text
-http://127.0.0.1:8000/api
+http://127.0.0.1:3000/api
 ```
 
-No debe configurarse el puerto 3000 como endpoint de la API de esta versión.
+El puerto configurado en Django y en el frontend debe coincidir.
 
 ## 14. Acceso administrativo
 
@@ -281,7 +281,7 @@ python manage.py createsuperuser
 No vuelva a ejecutar el comando si ya existe una cuenta administrativa. Después de iniciar sesión, el panel estará disponible en:
 
 ```text
-http://127.0.0.1:8000/admin/
+http://127.0.0.1:3000/admin/
 ```
 
 Los permisos funcionales del sistema no se derivan exclusivamente de la interfaz administrativa. Los endpoints de Django REST Framework verifican la autenticación y el perfil de cada usuario.
@@ -394,8 +394,8 @@ No elimine la base ni sus datos para realizar la comprobación.
 
 ### El frontend no puede comunicarse con Django
 
-- Confirme que Django escucha en `127.0.0.1:8000`.
-- Verifique que `frontend/js/auth.js` y `frontend/js/app.js` utilicen `http://127.0.0.1:8000/api`.
+- Confirme que Django escucha en `127.0.0.1:3000`.
+- Verifique que `frontend/js/auth.js` y `frontend/js/app.js` utilicen `http://127.0.0.1:3000/api`.
 - Elimine el valor incorrecto almacenado en `inventario.apiBase` y vuelva a cargar la página si una versión anterior lo conservó.
 - Compruebe los orígenes CORS cuando Live Server no use la dirección configurada.
 
@@ -428,7 +428,7 @@ No cree migraciones nuevas ni modifique los datos si la estructura ya coincide; 
 
 - Estado: entrega académica.
 - Entorno documentado: Windows, Python, Django, MySQL y navegador.
-- API principal: `http://127.0.0.1:8000/api/`.
+- API principal: `http://127.0.0.1:3000/api/`.
 - Base configurada: `magnussig_inventario`.
 - Persistencia: Django ORM sobre MySQL.
 - Rama estable esperada: `main`.

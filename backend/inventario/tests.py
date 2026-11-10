@@ -142,8 +142,20 @@ class InventoryApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         user = User.objects.get(email="new@example.test")
         self.assertTrue(user.check_password("AnotherUnitTestPassword!246"))
-        self.assertTrue(user.is_active)
+        self.assertFalse(user.is_active)
         self.assertEqual(user.perfil_inventario.rol, "Empleado")
+
+        response = self.client.delete(f"/api/usuarios/{user.id}/")
+        self.assertEqual(response.status_code, 403)
+        self.authenticate(self.super_admin)
+        response = self.client.patch(
+            f"/api/usuarios/{user.id}/",
+            {"estado": "Activo"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
         token = Token.objects.create(user=user)
 
         response = self.client.delete(f"/api/usuarios/{user.id}/")
@@ -167,6 +179,7 @@ class InventoryApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         user = User.objects.get(email="another-admin@example.test")
         self.assertTrue(user.is_staff)
+        self.assertFalse(user.is_active)
         self.assertEqual(user.perfil_inventario.rol, "Administrador")
 
     def test_regular_admin_cannot_create_super_administrator(self):
@@ -238,7 +251,38 @@ class InventoryApiTests(TestCase):
             if listed_user["id"] == user.id
         )
         self.assertEqual(pending_user["estado"], "Pendiente")
-        approval = self.client.patch(f"/api/usuarios/{user.id}/", {}, format="json")
+        denied_approval = self.client.patch(
+            f"/api/usuarios/{user.id}/",
+            {"estado": "Activo"},
+            format="json",
+        )
+        self.assertEqual(denied_approval.status_code, 403)
+
+        self.client.credentials()
+        self.authenticate(self.super_admin)
+        approval = self.client.patch(
+            f"/api/usuarios/{user.id}/",
+            {"estado": "Activo"},
+            format="json",
+        )
+        self.assertEqual(approval.status_code, 200)
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
+
+        review = self.client.patch(
+            f"/api/usuarios/{user.id}/",
+            {"estado": "Pendiente"},
+            format="json",
+        )
+        self.assertEqual(review.status_code, 200)
+        user.refresh_from_db()
+        self.assertFalse(user.is_active)
+
+        approval = self.client.patch(
+            f"/api/usuarios/{user.id}/",
+            {"estado": "Activo"},
+            format="json",
+        )
         self.assertEqual(approval.status_code, 200)
         user.refresh_from_db()
         self.assertTrue(user.is_active)

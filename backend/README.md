@@ -65,7 +65,7 @@ La auditoría local del 10 de noviembre de 2026 encontró 31 pruebas y terminó 
 - Una prueba útil de persistencia es crear un producto de prueba, cerrar sesión y volver a entrar; para comprobar reinicio de servicio, detener Django con `Ctrl+C`, iniciarlo de nuevo contra la misma base y consultar el producto de nuevo.
 
 ## Endpoints principales
-- `POST /api/auth/register/` — registro público con nombre, correo, contraseña y confirmación. Las cuentas se crean como Empleado y quedan pendientes hasta que un administrador las apruebe en la sección Usuarios.
+- `POST /api/auth/register/` — registro público con nombre, correo, contraseña y confirmación. Las cuentas se crean como Empleado y quedan pendientes hasta que el super administrador las apruebe en la sección Usuarios.
 - `POST /api/auth/login/` — recibe `{ "email": "...", "password": "..." }`, devuelve token y usuario.
 - `POST /api/auth/logout/` — revoca el token de la sesión autenticada.
 - `POST /api/auth/password-reset/` — solicita recuperación; para envío real configura EMAIL en Django.
@@ -75,7 +75,7 @@ La auditoría local del 10 de noviembre de 2026 encontró 31 pruebas y terminó 
 - `GET/POST /api/ventas/`, `GET /api/ventas/{id}/` — consultar ventas propias o de todo el equipo (administrador) y registrar ventas con varios productos.
 - `GET/POST /api/ayuda/`, `GET /api/ayuda/{id}/`, `POST /api/ayuda/{id}/mensajes/` — conversaciones internas; usuarios ven las propias y administradores atienden la bandeja. `POST /api/ayuda/{id}/cerrar/` es solo administrador.
 - `GET /api/dashboard/` — indicadores.
-- `GET/POST /api/usuarios/`, `PATCH /api/usuarios/{id}/` y `DELETE /api/usuarios/{id}/` — solo administrador. Las cuentas pendientes aparecen primero y cualquier administrador puede aprobarlas; la creación permite asignar roles sin permitir a un administrador regular crear otro Super Administrador.
+- `GET/POST /api/usuarios/`, `PATCH /api/usuarios/{id}/` y `DELETE /api/usuarios/{id}/` — solo administrador. Los usuarios creados por administradores regulares también quedan pendientes; únicamente el super administrador puede aprobar, enviar a revisión o rechazar solicitudes. Las cuentas activas anteriores se pueden enviar a revisión desde la tabla Usuarios.
 - `GET /health/` — comprobación básica del servicio.
 
 ## Correo y seguridad

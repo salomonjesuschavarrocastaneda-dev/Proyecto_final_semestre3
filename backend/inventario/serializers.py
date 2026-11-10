@@ -537,16 +537,16 @@ class UserCreateSerializer(serializers.Serializer):
         while User.objects.filter(username=username).exists():
             username = f"{base}{index}"
             index += 1
-        is_public_registration = self.context.get("public_registration", False)
+        requires_approval = self.context.get("public_registration", False) or self.context.get(
+            "require_approval", False
+        )
         user = User.objects.create_user(
             username=username,
             email=validated_data["email"],
             password=validated_data["password"],
             first_name=nombre,
             is_staff=validated_data["rol"] in {"Administrador", "Super Administrador"},
-            # El alta pública queda pendiente; el alta realizada por un administrador
-            # queda activa porque ya fue autorizada desde el panel de gestión.
-            is_active=not is_public_registration,
+            is_active=not requires_approval,
         )
         PerfilUsuario.objects.create(usuario=user, rol=validated_data["rol"])
         return user

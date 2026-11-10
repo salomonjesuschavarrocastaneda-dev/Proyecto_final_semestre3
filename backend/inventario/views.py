@@ -74,6 +74,7 @@ def user_payload(user):
         "email": user.email,
         "rol": role,
         "is_staff": user.is_staff,
+        "estado": "Activo" if user.is_active else "Pendiente",
     }
 
 
@@ -403,7 +404,10 @@ def users_view(request):
                 {"detail": "Solo el super administrador puede crear otra cuenta con ese rol."},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        serializer = UserCreateSerializer(data=request.data)
+        serializer = UserCreateSerializer(
+            data=request.data,
+            context={"require_approval": not is_super_admin(request.user)},
+        )
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response(user_payload(user), status=status.HTTP_201_CREATED)
@@ -443,13 +447,34 @@ def user_detail_view(request, user_id):
             status=status.HTTP_404_NOT_FOUND,
         )
     if request.method == "PATCH":
-        user.is_active = True
+        if not is_super_admin(request.user):
+            return Response(
+                {"detail": "Solo el super administrador puede resolver solicitudes."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if is_super_admin(user) or user.pk == request.user.pk:
+            return Response(
+                {"detail": "No puedes cambiar el estado de una cuenta de super administrador."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        requested_state = request.data.get("estado", "Activo")
+        if requested_state not in {"Activo", "Pendiente"}:
+            return Response(
+                {"detail": "El estado debe ser Activo o Pendiente."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        user.is_active = requested_state == "Activo"
         user.save(update_fields=["is_active"])
         return Response(user_payload(user))
     if user.pk == request.user.pk:
         return Response(
             {"detail": "No puedes eliminar la cuenta con la que iniciaste sesión."},
             status=status.HTTP_400_BAD_REQUEST,
+        )
+    if not user.is_active and not is_super_admin(request.user):
+        return Response(
+            {"detail": "Solo el super administrador puede rechazar solicitudes pendientes."},
+            status=status.HTTP_403_FORBIDDEN,
         )
     if is_inventory_admin(user) and not User.objects.filter(
         Q(is_staff=True) | Q(perfil_inventario__rol="Administrador")

@@ -408,7 +408,7 @@ def users_view(request):
         user = serializer.save()
         return Response(user_payload(user), status=status.HTTP_201_CREATED)
 
-    users = User.objects.all().order_by("first_name", "username")
+    users = User.objects.all().order_by("is_active", "first_name", "username")
     return Response(
         [
             {
@@ -420,7 +420,7 @@ def users_view(request):
                     if hasattr(user, "perfil_inventario")
                     else "Administrador" if user.is_staff else "Empleado"
                 ),
-                "estado": "Activo" if user.is_active else "Inactivo",
+                "estado": "Activo" if user.is_active else "Pendiente",
                 "creado": user.date_joined.date().isoformat(),
             }
             for user in users
@@ -443,11 +443,6 @@ def user_detail_view(request, user_id):
             status=status.HTTP_404_NOT_FOUND,
         )
     if request.method == "PATCH":
-        if not is_super_admin(request.user):
-            return Response(
-                {"detail": "Solo el super administrador puede aprobar cuentas."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
         user.is_active = True
         user.save(update_fields=["is_active"])
         return Response(user_payload(user))

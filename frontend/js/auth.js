@@ -134,7 +134,7 @@ forms.register.addEventListener('submit', async (event) => {
     accountCreated = true;
     forms.register.reset();
     setMode('login');
-    alertMessage('Tu cuenta fue creada y está pendiente de aprobación por el super administrador.', 'success');
+    alertMessage('Tu cuenta fue creada y está pendiente de aprobación por un administrador.', 'success');
   } catch (error) {
     alertMessage(accountCreated
       ? `La cuenta se creó, pero no se pudo iniciar sesión: ${error.message}`

@@ -219,14 +219,25 @@ class InventoryApiTests(TestCase):
         self.assertEqual(login_response.status_code, 403)
         self.assertIn("pendiente de aprobación", login_response.data["detail"])
 
-        self.authenticate(self.admin)
-        denied_approval = self.client.patch(f"/api/usuarios/{user.id}/", {}, format="json")
+        self.authenticate(self.user)
+        denied_approval = self.client.patch(
+            f"/api/usuarios/{user.id}/",
+            {},
+            format="json",
+        )
         self.assertEqual(denied_approval.status_code, 403)
-        user.refresh_from_db()
-        self.assertFalse(user.is_active)
 
         self.client.credentials()
-        self.authenticate(self.super_admin)
+        self.authenticate(self.admin)
+        users_response = self.client.get("/api/usuarios/")
+        self.assertEqual(users_response.status_code, 200)
+        self.assertEqual(users_response.data[0]["id"], user.id)
+        pending_user = next(
+            listed_user
+            for listed_user in users_response.data
+            if listed_user["id"] == user.id
+        )
+        self.assertEqual(pending_user["estado"], "Pendiente")
         approval = self.client.patch(f"/api/usuarios/{user.id}/", {}, format="json")
         self.assertEqual(approval.status_code, 200)
         user.refresh_from_db()

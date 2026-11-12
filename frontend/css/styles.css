@@ -111,3 +111,5 @@ html, body { width: 100%; min-height: 100%; }
   .sale-cart-line button { grid-column: 1 / -1; justify-self: start; }
 }
 .metric-value-inventory { font-size: clamp(17px, 1.65vw, 23px); letter-spacing: -.045em; overflow-wrap: anywhere; }
+.brand-lockup { min-height: 120px; justify-content: center; }
+.sidebar-logo { width: 100%; max-width: 100%; max-height: 100px; flex: 0 1 100%; object-position: center; }
